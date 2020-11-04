@@ -36,8 +36,8 @@ export default function CreateWorkentry({ url }) {
         let [fetched_categories, fetched_projects] = await Promise.all([fetch(CATEGORY_URL), fetch(PROJECT_URL)]);
         fetched_categories = await fetched_categories.json();
         fetched_projects = await fetched_projects.json();
-        console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_categories)}`);
-        console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_projects)}`);
+        console.dir(`Successfully fetched, data recieved: ${fetched_categories}`);
+        console.dir(`Successfully fetched, data recieved: ${fetched_projects}`);
         await setCategories(fetched_categories.data);
         await setProjects(fetched_projects.data);
       } catch (err) {

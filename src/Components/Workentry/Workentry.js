@@ -34,16 +34,18 @@ export default function Workentry({ url }) {
         </tr>
       </thead>
       <tbody>
-        {workentries.map((w) => (
-          <tr key={w._id}>
-            <td>{w._id.substring(0, 8)}</td>
-            <td>{w.project.project}</td>
-            <td>{w.category.category}</td>
-            <td>{w.optionalText}</td>
-            <td>{moment(w.fromDate).format("DD.MM.YYYY hh:mm:ss")}</td>
-            <td>{moment(w.untilDate).format("DD.MM.YYYY hh:mm:ss")}</td>
-          </tr>
-        ))}
+        {workentries.map((w) => {
+          return (
+            <tr key={w._id}>
+              <td>{w._id.substring(0, 8)}</td>
+              <td>{w.project ? w.project.project : "Unbekanntes Projekt"}</td>
+              <td>{w.category ? w.category.category : "Unbekannte Kategorie"}</td>
+              <td>{w.optionalText}</td>
+              <td>{moment(w.fromDate).format("DD.MM.YYYY hh:mm:ss")}</td>
+              <td>{moment(w.untilDate).format("DD.MM.YYYY hh:mm:ss")}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </Table>
     // <div>
