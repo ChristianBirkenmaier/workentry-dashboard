@@ -11,7 +11,7 @@ export default function Workentry({ url }) {
         console.log(`Fetching from ${url}`);
         let workentries = await fetch(url);
         workentries = await workentries.json();
-        console.dir(`Successfully fetched, data recieved: ${JSON.stringify(workentries)}`);
+        console.dir(`Successfully fetched, data recieved: ${workentries}`);
         await setWorkentries(workentries.data);
       } catch (err) {
         console.error(err);
@@ -41,8 +41,8 @@ export default function Workentry({ url }) {
               <td>{w.project ? w.project.project : "Unbekanntes Projekt"}</td>
               <td>{w.category ? w.category.category : "Unbekannte Kategorie"}</td>
               <td>{w.optionalText}</td>
-              <td>{moment(w.fromDate).format("DD.MM.YYYY hh:mm:ss")}</td>
-              <td>{moment(w.untilDate).format("DD.MM.YYYY hh:mm:ss")}</td>
+              <td>{w.fromDate}</td>
+              <td>{w.untilDate}</td>
             </tr>
           );
         })}
