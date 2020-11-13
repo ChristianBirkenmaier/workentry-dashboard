@@ -6,11 +6,9 @@ import Table from "react-bootstrap/Table";
 import Spinner from "react-bootstrap/Spinner";
 import moment from "moment";
 
-const CATEGORY_URL = "https://workentry-api.herokuapp.com/api/v1/category";
-const PROJECT_URL = "https://workentry-api.herokuapp.com/api/v1/project";
-const WORKENTRY_URL = "https://workentry-api.herokuapp.com/api/v1/workentry";
+import { PROD_WORKENTRY_API, PROD_CATEGORY_API, PROD_PROJECT_API, DEV_WORKENTRY_API, DEV_CATEGORY_API, DEV_PROJECT_API } from "../../config/api.json";
 
-export default function CreateWorkentry({ url }) {
+export default function CreateWorkentry() {
   let [categories, setCategories] = useState([]);
   let [projects, setProjects] = useState([]);
   let [selectedProject, setSelectedProject] = useState("");
@@ -20,6 +18,9 @@ export default function CreateWorkentry({ url }) {
   let [endTime, setEndTime] = useState(0);
   let [isTracking, setIsTracking] = useState(false);
   let [isDisabled, setIsDisabled] = useState(true);
+  const [workentryUrl, setWorkentryUrl] = useState(process.env.NODE_ENV == "development" ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
+  const [categoryUrl, setCategoryUrl] = useState(process.env.NODE_ENV == "development" ? DEV_CATEGORY_API : PROD_CATEGORY_API);
+  const [projectUrl, setProjectUrl] = useState(process.env.NODE_ENV == "development" ? DEV_PROJECT_API : PROD_PROJECT_API);
 
   function setDefault() {
     setSelectedCategory("");
@@ -32,8 +33,7 @@ export default function CreateWorkentry({ url }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log(`Fetching from ${url}`);
-        let [fetched_categories, fetched_projects] = await Promise.all([fetch(CATEGORY_URL), fetch(PROJECT_URL)]);
+        let [fetched_categories, fetched_projects] = await Promise.all([fetch(categoryUrl), fetch(projectUrl)]);
         fetched_categories = await fetched_categories.json();
         fetched_projects = await fetched_projects.json();
         console.dir(`Successfully fetched, data recieved: ${fetched_categories}`);
@@ -120,7 +120,7 @@ export default function CreateWorkentry({ url }) {
           variant="danger"
           disabled={isDisabled}
           onClick={async () => {
-            let resp = await fetch(WORKENTRY_URL, {
+            let resp = await fetch(workentryUrl, {
               method: "post",
               headers: {
                 "Content-Type": "application/json",

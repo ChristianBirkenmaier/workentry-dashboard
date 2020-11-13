@@ -2,22 +2,22 @@ import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 
-const CATEGORY_URL = "https://workentry-api.herokuapp.com/api/v1/category";
+import { PROD_CATEGORY_API, DEV_CATEGORY_API } from "../../config/api.json";
 
 export default function Category() {
   let [categories, setCategories] = useState([]);
   let [newCategory, setNewCategory] = useState("");
   let [updateCategory, setUpdateCategory] = useState("");
   let [updateId, setUpdateId] = useState(null);
-
+  const [categoryUrl, setCategoryUrl] = useState(process.env.NODE_ENV == "development" ? DEV_CATEGORY_API : PROD_CATEGORY_API);
   useEffect(() => {
     fetchData();
   }, []);
 
   async function fetchData() {
     try {
-      console.log(`Fetching from ${CATEGORY_URL}`);
-      let [fetched_categories] = await Promise.all([fetch(CATEGORY_URL)]);
+      console.log(`Fetching from ${categoryUrl}`);
+      let [fetched_categories] = await Promise.all([fetch(categoryUrl)]);
       fetched_categories = await fetched_categories.json();
       console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_categories)}`);
       if (fetched_categories.ok) {
@@ -50,7 +50,7 @@ export default function Category() {
                   <>
                     <Button
                       onClick={async () => {
-                        let resp = await fetch(`${CATEGORY_URL}/${c._id}`, {
+                        let resp = await fetch(`${categoryUrl}/${c._id}`, {
                           method: "put",
                           headers: {
                             "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export default function Category() {
                     </Button>
                     <Button
                       onClick={async () => {
-                        let resp = await fetch(`${CATEGORY_URL}/${c._id}`, {
+                        let resp = await fetch(`${categoryUrl}/${c._id}`, {
                           method: "delete",
                           headers: {
                             "Content-Type": "application/json",
@@ -125,7 +125,7 @@ export default function Category() {
                 onClick={async () => {
                   console.log(newCategory);
 
-                  let resp = await fetch(CATEGORY_URL, {
+                  let resp = await fetch(categoryUrl, {
                     method: "post",
                     headers: {
                       "Content-Type": "application/json",

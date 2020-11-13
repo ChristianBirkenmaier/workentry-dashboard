@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
-
-const PROJECT_URL = "https://workentry-api.herokuapp.com/api/v1/project";
+import { PROD_PROJECT_API, DEV_PROJECT_API } from "../../config/api.json";
 
 export default function Project() {
   let [projects, setProjects] = useState([]);
   let [newProject, setNewProject] = useState("");
   let [updateProject, setUpdateProject] = useState("");
   let [updateId, setUpdateId] = useState(null);
+  const [projectUrl, setProjectUrl] = useState(process.env.NODE_ENV == "development" ? DEV_PROJECT_API : PROD_PROJECT_API);
 
   useEffect(() => {
     fetchData();
@@ -16,8 +16,8 @@ export default function Project() {
 
   async function fetchData() {
     try {
-      console.log(`Fetching from ${PROJECT_URL}`);
-      let [fetched_projects] = await Promise.all([fetch(PROJECT_URL)]);
+      console.log(`Fetching from ${projectUrl}`);
+      let [fetched_projects] = await Promise.all([fetch(projectUrl)]);
       fetched_projects = await fetched_projects.json();
       console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_projects)}`);
       await setProjects(fetched_projects.data);
@@ -46,7 +46,7 @@ export default function Project() {
                   <>
                     <Button
                       onClick={async () => {
-                        let resp = await fetch(`${PROJECT_URL}/${p._id}`, {
+                        let resp = await fetch(`${projectUrl}/${p._id}`, {
                           method: "put",
                           headers: {
                             "Content-Type": "application/json",
@@ -88,7 +88,7 @@ export default function Project() {
                     </Button>
                     <Button
                       onClick={async () => {
-                        let resp = await fetch(`${PROJECT_URL}/${p._id}`, {
+                        let resp = await fetch(`${projectUrl}/${p._id}`, {
                           method: "delete",
                           headers: {
                             "Content-Type": "application/json",
@@ -121,7 +121,7 @@ export default function Project() {
                 onClick={async () => {
                   console.log(newProject);
 
-                  let resp = await fetch(PROJECT_URL, {
+                  let resp = await fetch(projectUrl, {
                     method: "post",
                     headers: {
                       "Content-Type": "application/json",

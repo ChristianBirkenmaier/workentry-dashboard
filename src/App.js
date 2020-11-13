@@ -6,7 +6,7 @@ import { Workentry, CreateWorkentry } from "./Components/Workentry";
 import { Category } from "./Components/Category";
 import { Project } from "./Components/Project";
 
-const WorkentriesComp = <Workentry url="https://workentry-api.herokuapp.com/api/v1/workentry" />;
+const WorkentriesComp = <Workentry />;
 const CreateWorkentryComp = <CreateWorkentry />;
 const CategoryComp = <Category />;
 const ProjectComp = <Project />;
@@ -20,7 +20,7 @@ function App() {
           <Nav.Link onClick={() => setActiveComponent(CategoryComp)}>Categories</Nav.Link>
           <Nav.Link onClick={() => setActiveComponent(ProjectComp)}>Projects</Nav.Link>
           <Nav.Link onClick={() => setActiveComponent(WorkentriesComp)}>Workentries</Nav.Link>
-          <Nav.Link onClick={() => setActiveComponent(CreateWorkentryComp)}>New Workentry</Nav.Link>
+          {/* <Nav.Link onClick={() => setActiveComponent(CreateWorkentryComp)}>New Workentry</Nav.Link> */}
         </Nav>
       </Navbar>
       <header className="App-header">{activeComponent}</header>
