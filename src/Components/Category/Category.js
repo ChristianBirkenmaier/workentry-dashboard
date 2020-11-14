@@ -33,8 +33,8 @@ export default function Category() {
 
   return (
     <>
-      <Container className="category-container">
-        <Row className="category-header align-items-center">
+      <Container className="data-container">
+        <Row className="data-header align-items-center">
           <Col sm={3}>ID</Col>
           <Col sm={4}>Kategoriename</Col>
           <Col sm={2}></Col>
