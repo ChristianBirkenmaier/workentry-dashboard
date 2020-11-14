@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar, Nav } from "react-bootstrap";
+import { Navbar, Nav, Container } from "react-bootstrap";
 import { Workentry, CreateWorkentry } from "./Components/Workentry";
 import { Category } from "./Components/Category";
 import { Project } from "./Components/Project";
@@ -15,7 +15,7 @@ function App() {
   let [activeComponent, setActiveComponent] = useState(WorkentriesComp);
   return (
     <div className="App">
-      <Navbar bg="dark" variant="dark" style={{ top: 0 }}>
+      <Navbar>
         <Nav>
           <Nav.Link onClick={() => setActiveComponent(CategoryComp)}>Categories</Nav.Link>
           <Nav.Link onClick={() => setActiveComponent(ProjectComp)}>Projects</Nav.Link>
@@ -23,7 +23,7 @@ function App() {
           {/* <Nav.Link onClick={() => setActiveComponent(CreateWorkentryComp)}>New Workentry</Nav.Link> */}
         </Nav>
       </Navbar>
-      <header className="App-header">{activeComponent}</header>
+      <body>{activeComponent}</body>
     </div>
   );
 }

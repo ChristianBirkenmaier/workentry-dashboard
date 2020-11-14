@@ -28,7 +28,7 @@ export default function Project() {
 
   return (
     <>
-      <Table striped bordered hover variant="dark" size="sm" style={{ tableLayout: "fixed" }}>
+      <Table striped bordered hover variant="light" size="sm" style={{ tableLayout: "fixed" }}>
         <thead>
           <tr>
             <th>id</th>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Container, Row, Col } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 
@@ -32,11 +33,142 @@ export default function Category() {
 
   return (
     <>
-      <Table striped bordered hover variant="dark" size="sm" style={{ tableLayout: "fixed" }}>
+      <Container className="category-container">
+        <Row className="category-header align-items-center">
+          <Col sm={3}>ID</Col>
+          <Col sm={4}>Kategoriename</Col>
+          <Col sm={2}></Col>
+          <Col sm={2}></Col>
+          <Col sm={1}></Col>
+        </Row>
+        {categories.map((c) => (
+          <Row key={c._id} className="align-items-center">
+            <Col sm={3}>{c._id}</Col>
+            <Col sm={4}>{c._id == updateId ? <input onChange={(e) => setUpdateCategory(e.target.value)} value={updateCategory}></input> : c.category}</Col>
+            <Col sm={2}>
+              {c._id == updateId ? (
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    let resp = await fetch(`${categoryUrl}/${c._id}`, {
+                      method: "put",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        id: c._id,
+                        category: updateCategory,
+                      }),
+                    });
+                    console.log(resp);
+                    resp = await resp.text();
+                    console.log("Updated successfully", resp);
+                    fetchData();
+                    setUpdateId(null);
+                  }}
+                  variant="primary"
+                >
+                  Speichern
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={async () => {
+                      setUpdateCategory(c.category);
+                      setUpdateId(c._id);
+                    }}
+                    variant="dark"
+                  >
+                    Ändern
+                  </Button>
+                </>
+              )}
+            </Col>
+            <Col sm={2}>
+              {c._id == updateId ? (
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    setUpdateId(null);
+                  }}
+                  variant="warning"
+                >
+                  Abbrechen
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={async () => {
+                    let resp = await fetch(`${categoryUrl}/${c._id}`, {
+                      method: "delete",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        id: c._id,
+                      }),
+                    });
+                    console.log(resp);
+                    resp = await resp.text();
+                    console.log("Deleted successfully", resp);
+                    fetchData();
+                  }}
+                  variant="danger"
+                >
+                  Löschen
+                </Button>
+              )}
+            </Col>
+            <Col sm={1}></Col>
+          </Row>
+        ))}
+        <Row className="align-items-center">
+          <Col sm={3} style={{ fontWeight: "bold" }}>
+            Neue Kategorie
+          </Col>
+          <Col sm={4}>
+            <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}></input>
+          </Col>
+          <Col sm={2}></Col>
+
+          <Col sm={2}>
+            <Button
+              size="sm"
+              block
+              onClick={async () => {
+                console.log(newCategory);
+
+                let resp = await fetch(categoryUrl, {
+                  method: "post",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    category: newCategory,
+                  }),
+                });
+                console.log(resp);
+                resp = await resp.text();
+                console.log("Posted successfully", resp);
+
+                // posting
+                setNewCategory("");
+                fetchData();
+              }}
+              variant="primary"
+            >
+              Add
+            </Button>
+          </Col>
+        </Row>
+      </Container>
+      {/* <Table striped bordered hover variant="light" size="sm" style={{ tableLayout: "fixed" }}>
         <thead>
           <tr>
             <th>id</th>
             <th>Category</th>
+            <th>#</th>
             <th>#</th>
           </tr>
         </thead>
@@ -47,70 +179,77 @@ export default function Category() {
               <td>{c._id == updateId ? <input onChange={(e) => setUpdateCategory(e.target.value)} value={updateCategory}></input> : c.category}</td>
               <td>
                 {c._id == updateId ? (
-                  <>
-                    <Button
-                      onClick={async () => {
-                        let resp = await fetch(`${categoryUrl}/${c._id}`, {
-                          method: "put",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            id: c._id,
-                            category: updateCategory,
-                          }),
-                        });
-                        console.log(resp);
-                        resp = await resp.text();
-                        console.log("Updated successfully", resp);
-                        fetchData();
-                        setUpdateId(null);
-                      }}
-                      variant="primary"
-                    >
-                      e
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        setUpdateId(null);
-                      }}
-                      variant="warning"
-                    >
-                      x
-                    </Button>
-                  </>
+                  <Button
+                    block
+                    onClick={async () => {
+                      let resp = await fetch(`${categoryUrl}/${c._id}`, {
+                        method: "put",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          id: c._id,
+                          category: updateCategory,
+                        }),
+                      });
+                      console.log(resp);
+                      resp = await resp.text();
+                      console.log("Updated successfully", resp);
+                      fetchData();
+                      setUpdateId(null);
+                    }}
+                    variant="primary"
+                  >
+                    Speichern
+                  </Button>
                 ) : (
                   <>
                     <Button
+                      block
                       onClick={async () => {
                         setUpdateCategory(c.category);
                         setUpdateId(c._id);
                       }}
-                      variant="success"
+                      variant="dark"
                     >
-                      e
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        let resp = await fetch(`${categoryUrl}/${c._id}`, {
-                          method: "delete",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            id: c._id,
-                          }),
-                        });
-                        console.log(resp);
-                        resp = await resp.text();
-                        console.log("Deleted successfully", resp);
-                        fetchData();
-                      }}
-                      variant="danger"
-                    >
-                      X
+                      Ändern
                     </Button>
                   </>
+                )}
+              </td>
+              <td>
+                {c._id == updateId ? (
+                  <Button
+                    block
+                    onClick={async () => {
+                      setUpdateId(null);
+                    }}
+                    variant="warning"
+                  >
+                    Abbrechen
+                  </Button>
+                ) : (
+                  <Button
+                    block
+                    onClick={async () => {
+                      let resp = await fetch(`${categoryUrl}/${c._id}`, {
+                        method: "delete",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          id: c._id,
+                        }),
+                      });
+                      console.log(resp);
+                      resp = await resp.text();
+                      console.log("Deleted successfully", resp);
+                      fetchData();
+                    }}
+                    variant="danger"
+                  >
+                    Löschen
+                  </Button>
                 )}
               </td>
             </tr>
@@ -120,7 +259,7 @@ export default function Category() {
             <td>
               <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}></input>
             </td>
-            <td>
+            <td colSpan="2">
               <Button
                 onClick={async () => {
                   console.log(newCategory);
@@ -149,7 +288,7 @@ export default function Category() {
             </td>
           </tr>
         </tbody>
-      </Table>
+      </Table> */}
     </>
   );
 }
