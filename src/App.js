@@ -23,7 +23,7 @@ function App() {
           {/* <Nav.Link onClick={() => setActiveComponent(CreateWorkentryComp)}>New Workentry</Nav.Link> */}
         </Nav>
       </Navbar>
-      <body>{activeComponent}</body>
+      <div>{activeComponent}</div>
     </div>
   );
 }
