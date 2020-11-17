@@ -26,12 +26,13 @@ export default function Workentry() {
   return (
     <Container className="data-container">
       <Row className="data-header align-items-center">
-        <Col sm={2}>ID</Col>
+        <Col sm={1}>ID</Col>
         <Col sm={2}>Kategorie</Col>
         <Col sm={2}>Projekt</Col>
         <Col sm={4}>Kommentar</Col>
         <Col sm={1}>Von</Col>
         <Col sm={1}>Bis</Col>
+        <Col sm={1}></Col>
       </Row>
       {workentries.map((w) => (
         <Row key={w._id} className="align-items-center">
@@ -41,6 +42,7 @@ export default function Workentry() {
           <Col sm={4}>{w.optionalText}</Col>
           <Col sm={1}>{w.fromDate}</Col>
           <Col sm={1}>{w.untilDate}</Col>
+          <Col sm={1}>X</Col>
         </Row>
       ))}
     </Container>
