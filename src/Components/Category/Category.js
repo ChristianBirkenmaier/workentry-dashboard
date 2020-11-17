@@ -5,15 +5,22 @@ import Table from "react-bootstrap/Table";
 
 import { PROD_CATEGORY_API, DEV_CATEGORY_API } from "../../config/api.json";
 
-export default function Category() {
+export default function Category({ isDev }) {
   let [categories, setCategories] = useState([]);
   let [newCategory, setNewCategory] = useState("");
   let [updateCategory, setUpdateCategory] = useState("");
   let [updateId, setUpdateId] = useState(null);
-  const [categoryUrl, setCategoryUrl] = useState(process.env.NODE_ENV == "development" ? DEV_CATEGORY_API : PROD_CATEGORY_API);
+  const [categoryUrl, setCategoryUrl] = useState(isDev ? DEV_CATEGORY_API : PROD_CATEGORY_API);
   useEffect(() => {
     fetchData();
   }, []);
+  useEffect(() => {
+    setCategoryUrl(isDev ? DEV_CATEGORY_API : PROD_CATEGORY_API);
+  }, [isDev]);
+
+  useEffect(() => {
+    fetchData();
+  }, [categoryUrl]);
 
   async function fetchData() {
     try {
@@ -28,6 +35,7 @@ export default function Category() {
       }
     } catch (err) {
       console.error(err);
+      setCategories([]);
     }
   }
 

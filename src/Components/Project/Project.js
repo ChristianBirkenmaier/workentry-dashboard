@@ -4,16 +4,25 @@ import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import { PROD_PROJECT_API, DEV_PROJECT_API } from "../../config/api.json";
 
-export default function Project() {
+export default function Project({ isDev }) {
   let [projects, setProjects] = useState([]);
   let [newProject, setNewProject] = useState("");
   let [updateProject, setUpdateProject] = useState("");
   let [updateId, setUpdateId] = useState(null);
-  const [projectUrl, setProjectUrl] = useState(process.env.NODE_ENV == "development" ? DEV_PROJECT_API : PROD_PROJECT_API);
+  const [projectUrl, setProjectUrl] = useState(isDev ? DEV_PROJECT_API : PROD_PROJECT_API);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("isDev: ", isDev);
+    setProjectUrl(isDev ? DEV_PROJECT_API : PROD_PROJECT_API);
+  }, [isDev]);
+
+  useEffect(() => {
+    fetchData();
+  }, [projectUrl]);
 
   async function fetchData() {
     try {
@@ -24,6 +33,7 @@ export default function Project() {
       await setProjects(fetched_projects.data);
     } catch (err) {
       console.error(err);
+      setProjects([]);
     }
   }
 

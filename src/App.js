@@ -1,29 +1,62 @@
 import React, { useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar, Nav, Container } from "react-bootstrap";
+import { Navbar, Nav, Container, Dropdown, Form } from "react-bootstrap";
 import { Workentry, CreateWorkentry } from "./Components/Workentry";
 import { Category } from "./Components/Category";
 import { Project } from "./Components/Project";
 
-const WorkentriesComp = <Workentry />;
-const CreateWorkentryComp = <CreateWorkentry />;
-const CategoryComp = <Category />;
-const ProjectComp = <Project />;
-
 function App() {
-  let [activeComponent, setActiveComponent] = useState(WorkentriesComp);
+  let [activeComponent, setActiveComponent] = useState("workentries");
+  let [isDev, setIsDev] = useState(process.env.NODE_ENV === "development");
+
+  // const WorkentriesComp = <Workentry isDev={isDev} />;
+  // const CreateWorkentryComp = <CreateWorkentry />;
+  // const CategoryComp = <Category isDev={isDev} />;
+  // const ProjectComp = <Project isDev={isDev} />;
   return (
     <div className="App">
       <Navbar>
-        <Nav>
-          <Nav.Link onClick={() => setActiveComponent(CategoryComp)}>Categories</Nav.Link>
-          <Nav.Link onClick={() => setActiveComponent(ProjectComp)}>Projects</Nav.Link>
-          <Nav.Link onClick={() => setActiveComponent(WorkentriesComp)}>Workentries</Nav.Link>
-          {/* <Nav.Link onClick={() => setActiveComponent(CreateWorkentryComp)}>New Workentry</Nav.Link> */}
+        <Nav className="mr-auto">
+          <Nav.Link onClick={() => setActiveComponent("projects")}>Projects</Nav.Link>
+          <Nav.Link onClick={() => setActiveComponent("categories")}>Categories</Nav.Link>
+          <Nav.Link onClick={() => setActiveComponent("workentries")}>Workentries</Nav.Link>
         </Nav>
+        <Form inline>
+          <Dropdown>
+            <Dropdown.Toggle variant="warning" className="" block>
+              {isDev ? "Dev" : "Prod"}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item
+                onClick={() => {
+                  console.log("Setting connection to dev");
+                  setIsDev(true);
+                }}
+              >
+                Dev
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => {
+                  console.log("Setting connection to prod");
+                  setIsDev(false);
+                }}
+              >
+                Prod
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Form>
       </Navbar>
-      <div>{activeComponent}</div>
+      <div style={activeComponent != "workentries" ? { display: "none" } : {}}>
+        <Workentry isDev={isDev} />
+      </div>
+      <div style={activeComponent != "categories" ? { display: "none" } : {}}>
+        <Category isDev={isDev} />
+      </div>
+      <div style={activeComponent != "projects" ? { display: "none" } : {}}>
+        <Project isDev={isDev} />
+      </div>
     </div>
   );
 }

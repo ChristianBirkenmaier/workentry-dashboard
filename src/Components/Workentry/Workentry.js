@@ -4,24 +4,34 @@ import moment from "moment";
 import { PROD_WORKENTRY_API, DEV_WORKENTRY_API } from "../../config/api.json";
 import { Col, Container, Row } from "react-bootstrap";
 
-export default function Workentry() {
+export default function Workentry({ isDev }) {
   let [workentries, setWorkentries] = useState([]);
-  const [workentryUrl, setWorkentryUrl] = useState(process.env.NODE_ENV == "development" ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
+  const [workentryUrl, setWorkentryUrl] = useState(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        console.log(`Fetching from ${workentryUrl}`);
-        let workentries = await fetch(workentryUrl);
-        workentries = await workentries.json();
-        console.dir(`Successfully fetched, data recieved: ${workentries}`);
-        await setWorkentries(workentries.data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    setWorkentryUrl(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
+  }, [isDev]);
+
+  useEffect(() => {
+    fetchData();
+  }, [workentryUrl]);
+
+  async function fetchData() {
+    try {
+      console.log(`Fetching from ${workentryUrl}`);
+      let workentries = await fetch(workentryUrl);
+      workentries = await workentries.json();
+      console.dir(`Successfully fetched, data recieved: ${workentries}`);
+      await setWorkentries(workentries.data);
+    } catch (err) {
+      console.error(err);
+      setWorkentries([]);
+    }
+  }
 
   return (
     <Container className="data-container">
