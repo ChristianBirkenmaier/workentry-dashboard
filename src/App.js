@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Navbar, Nav, Container, Dropdown, Form } from "react-bootstrap";
-import { Workentry, CreateWorkentry } from "./Components/Workentry";
+import { Navbar, Nav, Dropdown, Form } from "react-bootstrap";
+import { Workentry } from "./Components/Workentry";
 import { Category } from "./Components/Category";
 import { Project } from "./Components/Project";
 
@@ -18,9 +18,9 @@ function App() {
     <div className="App">
       <Navbar>
         <Nav className="mr-auto">
-          <Nav.Link onClick={() => setActiveComponent("projects")}>Projects</Nav.Link>
-          <Nav.Link onClick={() => setActiveComponent("categories")}>Categories</Nav.Link>
-          <Nav.Link onClick={() => setActiveComponent("workentries")}>Workentries</Nav.Link>
+          <Nav.Link onClick={() => setActiveComponent("projects")}>Projekte</Nav.Link>
+          <Nav.Link onClick={() => setActiveComponent("categories")}>Kategorien</Nav.Link>
+          <Nav.Link onClick={() => setActiveComponent("workentries")}>Zeiteinträge</Nav.Link>
         </Nav>
         <Form inline>
           <Dropdown>
@@ -48,13 +48,13 @@ function App() {
           </Dropdown>
         </Form>
       </Navbar>
-      <div style={activeComponent != "workentries" ? { display: "none" } : {}}>
+      <div style={activeComponent !== "workentries" ? { display: "none" } : {}}>
         <Workentry isDev={isDev} />
       </div>
-      <div style={activeComponent != "categories" ? { display: "none" } : {}}>
+      <div style={activeComponent !== "categories" ? { display: "none" } : {}}>
         <Category isDev={isDev} />
       </div>
-      <div style={activeComponent != "projects" ? { display: "none" } : {}}>
+      <div style={activeComponent !== "projects" ? { display: "none" } : {}}>
         <Project isDev={isDev} />
       </div>
     </div>

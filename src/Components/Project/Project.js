@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
-import Table from "react-bootstrap/Table";
 import { PROD_PROJECT_API, DEV_PROJECT_API } from "../../config/api.json";
 
 export default function Project({ isDev }) {
@@ -39,7 +38,7 @@ export default function Project({ isDev }) {
 
   return (
     <>
-      <Container className="data-container">
+      <Container fluid className="data-container">
         <Row className="data-header align-items-center">
           <Col sm={3}>ID</Col>
           <Col sm={4}>Projektname</Col>
@@ -50,9 +49,9 @@ export default function Project({ isDev }) {
         {projects.map((p) => (
           <Row key={p._id} className="align-items-center">
             <Col sm={3}>{p._id}</Col>
-            <Col sm={4}>{p._id == updateId ? <input onChange={(e) => setUpdateProject(e.target.value)} value={updateProject}></input> : p.project}</Col>
+            <Col sm={4}>{p._id === updateId ? <input onChange={(e) => setUpdateProject(e.target.value)} value={updateProject}></input> : p.project}</Col>
             <Col sm={2}>
-              {p._id == updateId ? (
+              {p._id === updateId ? (
                 <Button
                   size="sm"
                   onClick={async () => {
@@ -92,7 +91,7 @@ export default function Project({ isDev }) {
               )}
             </Col>
             <Col sm={2}>
-              {p._id == updateId ? (
+              {p._id === updateId ? (
                 <Button
                   size="sm"
                   onClick={async () => {
@@ -169,124 +168,6 @@ export default function Project({ isDev }) {
           </Col>
         </Row>
       </Container>
-      {/* <Table striped bordered hover variant="light" size="sm" style={{ tableLayout: "fixed" }}>
-        <thead>
-          <tr>
-            <th>id</th>
-            <th>Project</th>
-            <th>#</th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map((p) => (
-            <tr key={p._id}>
-              <td>{p._id.substring(0, 8)}</td>
-              <td>{p._id == updateId ? <input onChange={(e) => setUpdateProject(e.target.value)} value={updateProject}></input> : p.project}</td>
-              <td>
-                {p._id == updateId ? (
-                  <>
-                    <Button
-                      onClick={async () => {
-                        let resp = await fetch(`${projectUrl}/${p._id}`, {
-                          method: "put",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            id: p._id,
-                            project: updateProject,
-                          }),
-                        });
-                        console.log(resp);
-                        resp = await resp.text();
-                        console.log("Updated successfully", resp);
-                        fetchData();
-                        setUpdateId(null);
-                      }}
-                      variant="primary"
-                    >
-                      e
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        setUpdateId(null);
-                      }}
-                      variant="warning"
-                    >
-                      x
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      onClick={async () => {
-                        setUpdateProject(p.project);
-                        setUpdateId(p._id);
-                      }}
-                      variant="success"
-                    >
-                      e
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        let resp = await fetch(`${projectUrl}/${p._id}`, {
-                          method: "delete",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            id: p._id,
-                          }),
-                        });
-                        console.log(resp);
-                        resp = await resp.text();
-                        console.log("Deleted successfully", resp);
-                        fetchData();
-                      }}
-                      variant="danger"
-                    >
-                      X
-                    </Button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-          <tr>
-            <td>-</td>
-            <td>
-              <input value={newProject} onChange={(e) => setNewProject(e.target.value)}></input>
-            </td>
-            <td>
-              <Button
-                onClick={async () => {
-                  console.log(newProject);
-
-                  let resp = await fetch(projectUrl, {
-                    method: "post",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      project: newProject,
-                    }),
-                  });
-                  console.log(resp);
-                  resp = await resp.text();
-                  console.log("Posted successfully", resp);
-
-                  // posting
-                  setNewProject("");
-                  fetchData();
-                }}
-                variant="primary"
-              >
-                Add
-              </Button>
-            </td>
-          </tr>
-        </tbody>
-      </Table> */}
     </>
   );
 }
