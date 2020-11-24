@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { PROD_CATEGORY_API, DEV_CATEGORY_API } from "../../config/api.json";
+import sortList from "../../helpers";
+import { BsFillTrashFill, BsGear, BsFillBookmarkFill, BsFillXCircleFill } from "react-icons/bs";
 
 export default function Category({ isDev }) {
   let [categories, setCategories] = useState([]);
@@ -9,6 +11,7 @@ export default function Category({ isDev }) {
   let [updateCategory, setUpdateCategory] = useState("");
   let [updateId, setUpdateId] = useState(null);
   const [categoryUrl, setCategoryUrl] = useState(isDev ? DEV_CATEGORY_API : PROD_CATEGORY_API);
+  let [sort, setSort] = useState({ name: "category", asc: false });
 
   useEffect(() => {
     fetchData();
@@ -16,6 +19,11 @@ export default function Category({ isDev }) {
   useEffect(() => {
     setCategoryUrl(isDev ? DEV_CATEGORY_API : PROD_CATEGORY_API);
   }, [isDev]);
+
+  useEffect(() => {
+    console.log("useEffect sort");
+    setCategories(sortList(sort, categories));
+  }, [sort]);
 
   useEffect(() => {
     fetchData();
@@ -28,7 +36,7 @@ export default function Category({ isDev }) {
       fetched_categories = await fetched_categories.json();
       console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_categories)}`);
       if (fetched_categories.ok) {
-        await setCategories(fetched_categories.data);
+        setCategories(sortList(sort, fetched_categories.data));
       } else {
         throw new Error("Error while fetching categories");
       }
@@ -42,17 +50,29 @@ export default function Category({ isDev }) {
     <>
       <Container fluid className="data-container">
         <Row className="data-header align-items-center">
-          <Col sm={3}>ID</Col>
-          <Col sm={4}>Kategoriename</Col>
-          <Col sm={2}></Col>
-          <Col sm={2}></Col>
-          <Col sm={1}></Col>
+          <Col
+            sm={4}
+            onClick={() => {
+              setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
+            }}
+          >
+            ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+          </Col>
+          <Col
+            sm={4}
+            onClick={() => {
+              setSort({ name: "category", asc: sort.asc ? !sort.asc : true });
+            }}
+          >
+            Kategoriename {sort.name === "category" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+          </Col>
+          <Col sm={4}></Col>
         </Row>
         {categories.map((c) => (
           <Row key={c._id} className="align-items-center">
-            <Col sm={3}>{c._id}</Col>
+            <Col sm={4}>{c._id}</Col>
             <Col sm={4}>{c._id === updateId ? <input onChange={(e) => setUpdateCategory(e.target.value)} value={updateCategory}></input> : c.category}</Col>
-            <Col sm={2}>
+            <Col sm={4}>
               {c._id === updateId ? (
                 <Button
                   size="sm"
@@ -75,7 +95,7 @@ export default function Category({ isDev }) {
                   }}
                   variant="primary"
                 >
-                  Speichern
+                  <BsFillBookmarkFill />
                 </Button>
               ) : (
                 <>
@@ -87,12 +107,10 @@ export default function Category({ isDev }) {
                     }}
                     variant="dark"
                   >
-                    Ändern
+                    <BsGear />
                   </Button>
                 </>
               )}
-            </Col>
-            <Col sm={2}>
               {c._id === updateId ? (
                 <Button
                   size="sm"
@@ -101,7 +119,7 @@ export default function Category({ isDev }) {
                   }}
                   variant="warning"
                 >
-                  Abbrechen
+                  <BsFillXCircleFill />
                 </Button>
               ) : (
                 <Button
@@ -123,26 +141,22 @@ export default function Category({ isDev }) {
                   }}
                   variant="danger"
                 >
-                  Löschen
+                  <BsFillTrashFill />
                 </Button>
               )}
             </Col>
-            <Col sm={1}></Col>
           </Row>
         ))}
         <Row className="align-items-center">
-          <Col sm={3} style={{ fontWeight: "bold" }}>
+          <Col sm={4} style={{ fontWeight: "bold" }}>
             Neue Kategorie
           </Col>
           <Col sm={4}>
             <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}></input>
           </Col>
-          <Col sm={2}></Col>
-
-          <Col sm={2}>
+          <Col sm={4}>
             <Button
               size="sm"
-              block
               onClick={async () => {
                 console.log(newCategory);
 
@@ -165,7 +179,7 @@ export default function Category({ isDev }) {
               }}
               variant="primary"
             >
-              Add
+              <BsFillBookmarkFill />
             </Button>
           </Col>
         </Row>

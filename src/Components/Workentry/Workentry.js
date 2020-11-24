@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { PROD_WORKENTRY_API, DEV_WORKENTRY_API } from "../../config/api.json";
 import { Col, Container, Row, Button } from "react-bootstrap";
+import sortList from "../../helpers";
+import { BsFillTrashFill } from "react-icons/bs";
 
 export default function Workentry({ isDev }) {
   let [workentries, setWorkentries] = useState([]);
   const [workentryUrl, setWorkentryUrl] = useState(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
+
+  let [sort, setSort] = useState({ name: "category.category", asc: false });
 
   async function fetchData() {
     try {
       console.log(`Fetching from ${workentryUrl}`);
       let workentries = await fetch(workentryUrl);
       workentries = await workentries.json();
-      console.dir(`Successfully fetched, data recieved: ${workentries}`);
-      await setWorkentries(workentries.data);
+      console.dir(`Successfully fetched, data recieved: ${JSON.stringify(workentries)}`);
+      setWorkentries(sortList(sort, workentries.data));
     } catch (err) {
       console.error(err);
       setWorkentries([]);
@@ -21,6 +25,11 @@ export default function Workentry({ isDev }) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("useEffect sort");
+    setWorkentries(sortList(sort, workentries));
+  }, [sort]);
 
   useEffect(() => {
     setWorkentryUrl(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
@@ -56,10 +65,38 @@ export default function Workentry({ isDev }) {
   return (
     <Container fluid className="data-container">
       <Row className="data-header align-items-center">
-        <Col sm={1}>ID</Col>
-        <Col sm={2}>Kategorie</Col>
-        <Col sm={2}>Projekt</Col>
-        <Col sm={4}>Kommentar</Col>
+        <Col
+          onClick={() => {
+            setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
+          }}
+          sm={1}
+        >
+          ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+        </Col>
+        <Col
+          onClick={() => {
+            setSort({ name: "project.project", asc: sort.asc ? !sort.asc : true });
+          }}
+          sm={2}
+        >
+          Projekt {sort.name === "project.project" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+        </Col>
+        <Col
+          onClick={() => {
+            setSort({ name: "category.category", asc: sort.asc ? !sort.asc : true });
+          }}
+          sm={2}
+        >
+          Kategorie {sort.name === "category.category" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+        </Col>
+        <Col
+          onClick={() => {
+            setSort({ name: "optionalText", asc: sort.asc ? !sort.asc : true });
+          }}
+          sm={4}
+        >
+          Kommentar {sort.name === "optionalText" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+        </Col>
         <Col sm={1}>Von - Bis</Col>
         <Col sm={1}>Dauer</Col>
         <Col sm={1}></Col>
@@ -76,7 +113,7 @@ export default function Workentry({ isDev }) {
           <Col sm={1}> {calculateDuration(w.fromDate, w.untilDate)}</Col>
           <Col sm={1}>
             <Button variant="danger" size="sm" onClick={() => handleDelete(w._id)}>
-              X
+              <BsFillTrashFill />
             </Button>
           </Col>
         </Row>

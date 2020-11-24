@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { PROD_PROJECT_API, DEV_PROJECT_API } from "../../config/api.json";
+import sortList from "../../helpers";
+import { BsFillTrashFill, BsGear, BsFillBookmarkFill, BsFillXCircleFill } from "react-icons/bs";
 
 export default function Project({ isDev }) {
   let [projects, setProjects] = useState([]);
@@ -9,10 +11,16 @@ export default function Project({ isDev }) {
   let [updateProject, setUpdateProject] = useState("");
   let [updateId, setUpdateId] = useState(null);
   const [projectUrl, setProjectUrl] = useState(isDev ? DEV_PROJECT_API : PROD_PROJECT_API);
+  let [sort, setSort] = useState({ name: "project", asc: false });
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("useEffect sort");
+    setProjects(sortList(sort, projects));
+  }, [sort]);
 
   useEffect(() => {
     console.log("isDev: ", isDev);
@@ -29,7 +37,7 @@ export default function Project({ isDev }) {
       let [fetched_projects] = await Promise.all([fetch(projectUrl)]);
       fetched_projects = await fetched_projects.json();
       console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_projects)}`);
-      await setProjects(fetched_projects.data);
+      setProjects(sortList(sort, fetched_projects.data));
     } catch (err) {
       console.error(err);
       setProjects([]);
@@ -38,19 +46,34 @@ export default function Project({ isDev }) {
 
   return (
     <>
+      {/* <div>
+        Sort: name: {sort.name} asc: {sort.asc.toString()}
+      </div> */}
       <Container fluid className="data-container">
         <Row className="data-header align-items-center">
-          <Col sm={3}>ID</Col>
-          <Col sm={4}>Projektname</Col>
-          <Col sm={2}></Col>
-          <Col sm={2}></Col>
-          <Col sm={1}></Col>
+          <Col
+            sm={4}
+            onClick={() => {
+              setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
+            }}
+          >
+            ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+          </Col>
+          <Col
+            sm={4}
+            onClick={() => {
+              setSort({ name: "project", asc: sort.asc ? !sort.asc : true });
+            }}
+          >
+            Projektname {sort.name === "project" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+          </Col>
+          <Col sm={4}></Col>
         </Row>
         {projects.map((p) => (
           <Row key={p._id} className="align-items-center">
-            <Col sm={3}>{p._id}</Col>
+            <Col sm={4}>{p._id}</Col>
             <Col sm={4}>{p._id === updateId ? <input onChange={(e) => setUpdateProject(e.target.value)} value={updateProject}></input> : p.project}</Col>
-            <Col sm={2}>
+            <Col sm={4}>
               {p._id === updateId ? (
                 <Button
                   size="sm"
@@ -73,7 +96,7 @@ export default function Project({ isDev }) {
                   }}
                   variant="primary"
                 >
-                  Speichern
+                  <BsFillBookmarkFill />
                 </Button>
               ) : (
                 <>
@@ -85,12 +108,10 @@ export default function Project({ isDev }) {
                     }}
                     variant="dark"
                   >
-                    Ändern
+                    <BsGear />
                   </Button>
                 </>
               )}
-            </Col>
-            <Col sm={2}>
               {p._id === updateId ? (
                 <Button
                   size="sm"
@@ -99,7 +120,7 @@ export default function Project({ isDev }) {
                   }}
                   variant="warning"
                 >
-                  Abbrechen
+                  <BsFillXCircleFill />
                 </Button>
               ) : (
                 <Button
@@ -121,26 +142,23 @@ export default function Project({ isDev }) {
                   }}
                   variant="danger"
                 >
-                  Löschen
+                  <BsFillTrashFill />
                 </Button>
               )}
             </Col>
-            <Col sm={1}></Col>
           </Row>
         ))}
         <Row className="align-items-center">
-          <Col sm={3} style={{ fontWeight: "bold" }}>
+          <Col sm={4} style={{ fontWeight: "bold" }}>
             Neue Kategorie
           </Col>
           <Col sm={4}>
             <input value={newProject} onChange={(e) => setNewProject(e.target.value)}></input>
           </Col>
-          <Col sm={2}></Col>
 
-          <Col sm={2}>
+          <Col sm={4}>
             <Button
               size="sm"
-              block
               onClick={async () => {
                 console.log(newProject);
 
@@ -163,7 +181,7 @@ export default function Project({ isDev }) {
               }}
               variant="primary"
             >
-              Add
+              <BsFillBookmarkFill />
             </Button>
           </Col>
         </Row>

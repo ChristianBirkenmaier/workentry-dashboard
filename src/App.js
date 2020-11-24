@@ -8,7 +8,8 @@ import { Project } from "./Components/Project";
 
 function App() {
   let [activeComponent, setActiveComponent] = useState("workentries");
-  let [isDev, setIsDev] = useState(process.env.NODE_ENV === "development");
+  // let [isDev, setIsDev] = useState(process.env.NODE_ENV === "development");
+  let [isDev, setIsDev] = useState(false);
 
   // const WorkentriesComp = <Workentry isDev={isDev} />;
   // const CreateWorkentryComp = <CreateWorkentry />;
