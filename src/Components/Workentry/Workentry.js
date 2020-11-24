@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { PROD_WORKENTRY_API, DEV_WORKENTRY_API } from "../../config/api.json";
-import { Col, Container, Row, Button } from "react-bootstrap";
+import { Col, Container, Row, Button, FormControl, InputGroup } from "react-bootstrap";
 import sortList from "../../helpers";
 import { BsFillTrashFill } from "react-icons/bs";
 
 export default function Workentry({ isDev }) {
   let [workentries, setWorkentries] = useState([]);
+  let [filteredWorkentries, setFilteredWorkentries] = useState([]);
   const [workentryUrl, setWorkentryUrl] = useState(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
+  let [filter, setFilter] = useState({ filterRubric: null, filterText: null });
 
   let [sort, setSort] = useState({ name: "category.category", asc: false });
 
@@ -25,10 +27,13 @@ export default function Workentry({ isDev }) {
   useEffect(() => {
     fetchData();
   }, []);
+  useEffect(() => {
+    setFilteredWorkentries(workentries);
+  }, [workentries]);
 
   useEffect(() => {
     console.log("useEffect sort");
-    setWorkentries(sortList(sort, workentries));
+    setFilteredWorkentries(sortList(sort, workentries));
   }, [sort]);
 
   useEffect(() => {
@@ -38,6 +43,24 @@ export default function Workentry({ isDev }) {
   useEffect(() => {
     fetchData();
   }, [workentryUrl]);
+
+  useEffect(() => {
+    let filteredWorkentries = [];
+    switch (filter.filterRubric) {
+      case "project":
+        filteredWorkentries = workentries.filter((x) => x && x.project && x.project.project.includes(filter.filterText));
+        break;
+      case "category":
+        filteredWorkentries = workentries.filter((x) => x && x.category && x.category.category.includes(filter.filterText));
+        break;
+      case "id":
+        filteredWorkentries = workentries.filter((x) => x && x._id && x._id.includes(filter.filterText));
+        break;
+      case "optionalText":
+        filteredWorkentries = workentries.filter((x) => x && x.optionalText && x.optionalText.includes(filter.filterText));
+    }
+    setFilteredWorkentries(filteredWorkentries);
+  }, [filter]);
 
   async function handleDelete(id) {
     try {
@@ -101,7 +124,52 @@ export default function Workentry({ isDev }) {
         <Col sm={1}>Dauer</Col>
         <Col sm={1}></Col>
       </Row>
-      {workentries.map((w) => (
+      <Row>
+        <Col sm={1} className="m-0 p-0">
+          <InputGroup className="">
+            <FormControl
+              value={filter ? (filter.filterRubric === "id" ? filter.filterText : "") : ""}
+              onChange={(e) => setFilter({ filterRubric: "id", filterText: e.target.value })}
+              placeholder="id"
+              aria-label="id"
+            />
+          </InputGroup>
+        </Col>
+        <Col className="m-0 p-0" sm={2}>
+          <InputGroup className="">
+            <FormControl
+              placeholder="project"
+              aria-label="project"
+              value={filter ? (filter.filterRubric === "project" ? filter.filterText : "") : ""}
+              onChange={(e) => setFilter({ filterRubric: "project", filterText: e.target.value })}
+            />
+          </InputGroup>
+        </Col>
+        <Col className="m-0 p-0" sm={2}>
+          <InputGroup className="">
+            <FormControl
+              value={filter ? (filter.filterRubric === "category" ? filter.filterText : "") : ""}
+              onChange={(e) => setFilter({ filterRubric: "category", filterText: e.target.value })}
+              placeholder="category"
+              aria-label="category"
+            />
+          </InputGroup>
+        </Col>
+        <Col className="m-0 p-0" sm={4}>
+          <InputGroup className="">
+            <FormControl
+              value={filter ? (filter.filterRubric === "optionalText" ? filter.filterText : "") : ""}
+              onChange={(e) => setFilter({ filterRubric: "optionalText", filterText: e.target.value })}
+              placeholder="optionalText"
+              aria-label="optionalText"
+            />
+          </InputGroup>
+        </Col>
+        <Col sm={1}></Col>
+        <Col sm={1}></Col>
+        <Col sm={1}></Col>
+      </Row>
+      {filteredWorkentries.map((w) => (
         <Row key={w._id} className="align-items-center">
           <Col sm={1}>{w._id.substring(0, 8)}...</Col>
           <Col sm={2}>{w.project ? w.project.project : "Unbekanntes Projekt"}</Col>
