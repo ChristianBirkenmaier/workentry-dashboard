@@ -51,14 +51,14 @@ export default function Project({ isDev }) {
       </div> */}
       <Container fluid className="data-container">
         <Row className="data-header align-items-center">
-          <Col
+          {/* <Col
             sm={4}
             onClick={() => {
               setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
             }}
           >
             ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
-          </Col>
+          </Col> */}
           <Col
             sm={4}
             onClick={() => {
@@ -71,7 +71,7 @@ export default function Project({ isDev }) {
         </Row>
         {projects.map((p) => (
           <Row key={p._id} className="align-items-center">
-            <Col sm={4}>{p._id}</Col>
+            {/* <Col sm={4}>{p._id}</Col> */}
             <Col sm={4}>{p._id === updateId ? <input onChange={(e) => setUpdateProject(e.target.value)} value={updateProject}></input> : p.project}</Col>
             <Col sm={4}>
               {p._id === updateId ? (

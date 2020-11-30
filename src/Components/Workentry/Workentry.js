@@ -88,14 +88,14 @@ export default function Workentry({ isDev }) {
   return (
     <Container fluid className="data-container">
       <Row className="data-header align-items-center">
-        <Col
+        {/* <Col
           onClick={() => {
             setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
           }}
           sm={1}
         >
           ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
-        </Col>
+        </Col> */}
         <Col
           onClick={() => {
             setSort({ name: "project.project", asc: sort.asc ? !sort.asc : true });
@@ -125,7 +125,7 @@ export default function Workentry({ isDev }) {
         <Col sm={1}></Col>
       </Row>
       <Row>
-        <Col sm={1} className="m-0 p-0">
+        {/* <Col sm={1} className="m-0 p-0">
           <InputGroup className="">
             <FormControl
               value={filter ? (filter.filterRubric === "id" ? filter.filterText : "") : ""}
@@ -134,7 +134,7 @@ export default function Workentry({ isDev }) {
               aria-label="id"
             />
           </InputGroup>
-        </Col>
+        </Col> */}
         <Col className="m-0 p-0" sm={2}>
           <InputGroup className="">
             <FormControl
@@ -171,7 +171,7 @@ export default function Workentry({ isDev }) {
       </Row>
       {filteredWorkentries.map((w) => (
         <Row key={w._id} className="align-items-center">
-          <Col sm={1}>{w._id.substring(0, 8)}...</Col>
+          {/* <Col sm={1}>{w._id.substring(0, 8)}...</Col> */}
           <Col sm={2}>{w.project ? w.project.project : "Unbekanntes Projekt"}</Col>
           <Col sm={2}>{w.category ? w.category.category : "Unbekannte Kategorie"}</Col>
           <Col sm={4}>{w.optionalText}</Col>

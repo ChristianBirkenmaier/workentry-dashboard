@@ -50,14 +50,14 @@ export default function Category({ isDev }) {
     <>
       <Container fluid className="data-container">
         <Row className="data-header align-items-center">
-          <Col
+          {/* <Col
             sm={4}
             onClick={() => {
               setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
             }}
           >
             ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
-          </Col>
+          </Col> */}
           <Col
             sm={4}
             onClick={() => {
@@ -70,7 +70,7 @@ export default function Category({ isDev }) {
         </Row>
         {categories.map((c) => (
           <Row key={c._id} className="align-items-center">
-            <Col sm={4}>{c._id}</Col>
+            {/* <Col sm={4}>{c._id}</Col> */}
             <Col sm={4}>{c._id === updateId ? <input onChange={(e) => setUpdateCategory(e.target.value)} value={updateCategory}></input> : c.category}</Col>
             <Col sm={4}>
               {c._id === updateId ? (
