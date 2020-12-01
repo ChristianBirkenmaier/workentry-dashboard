@@ -1,52 +1,94 @@
 .App {
-  background-color: white;
+    background-color: white;
 }
 
 .App-main {
-  background-color: white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  align-self: start;
-  align-content: flex-start;
-  font-size: calc(10px + 2vmin);
-  color: white;
+    background-color: white;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: start;
+    align-content: flex-start;
+    font-size: calc(10px + 2vmin);
+    color: white;
 }
 
 .navbar {
-  background-color: #ffb600;
-  margin-bottom: 50px;
+    background-color: #ffb600;
+    margin-bottom: 50px;
 }
 
 .data-container {
-  background-color: white;
+    background-color: white;
 }
 
 .data-container button {
-  margin: 5px;
-  width: 40px;
-  padding-bottom: 7px;
+    margin: 5px;
+    width: 40px;
+    padding-bottom: 7px;
 }
 
 .row {
-  background-color: white;
+    background-color: white;
 }
 .row:first-child {
-  min-height: 50px;
+    min-height: 50px;
 }
 .row:nth-child(odd) {
-  background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .data-header {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .nav-link {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .App-link {
-  color: #61dafb;
+    color: #61dafb;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.data-container .filter-button {
+    width: auto;
+    padding: 12px;
+    margin: 0;
+}
+
+.data-container .list-header-row {
+    padding: 0;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.w-75 {
+    width: 75%;
+}
+
+.w-25 {
+    width: 25%;
+}
+
+.data-container .dropdown-toggle::after {
+    display: unset;
+    margin-left: unset;
+    vertical-align: unset;
+    content: unset;
+    border-top: unset;
+    border-left: unset;
+    border-bottom: unset;
+    border-left: unset;
+}
+
+.data-container .dropdown-menu {
+    max-height: 400px;
+    overflow: auto;
 }
