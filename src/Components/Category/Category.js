@@ -47,145 +47,135 @@ export default function Category({ isDev }) {
     }
 
     return (
-        <>
-            <Container className="data-container">
-                <Row className="data-header align-items-center">
-                    {/* <Col
-            sm={4}
-            onClick={() => {
-              setSort({ name: "_id", asc: sort.asc ? !sort.asc : true });
-            }}
-          >
-            ID {sort.name === "_id" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
-          </Col> */}
-                    <Col
-                        sm={4}
-                        onClick={() => {
-                            setSort({ name: "category", asc: sort.asc ? !sort.asc : true });
+        <Container className="data-container">
+            <Row className="data-header align-items-center">
+                <Col
+                    sm={10}
+                    onClick={() => {
+                        setSort({ name: "category", asc: sort.asc ? !sort.asc : true });
+                    }}
+                >
+                    Kategoriename {sort.name === "category" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
+                </Col>
+                <Col sm={2}></Col>
+            </Row>
+            {categories.map((c) => (
+                <Row key={c._id} className="align-items-center">
+                    {/* <Col sm={4}>{c._id}</Col> */}
+                    <Col sm={10}>
+                        {c._id === updateId ? <input onChange={(e) => setUpdateCategory(e.target.value)} value={updateCategory}></input> : c.category}
+                    </Col>
+                    <Col sm={2}>
+                        {c._id === updateId ? (
+                            <Button
+                                size="sm"
+                                onClick={async () => {
+                                    let resp = await fetch(`${categoryUrl}/${c._id}`, {
+                                        method: "put",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            id: c._id,
+                                            category: updateCategory,
+                                        }),
+                                    });
+                                    console.log(resp);
+                                    resp = await resp.text();
+                                    console.log("Updated successfully", resp);
+                                    fetchData();
+                                    setUpdateId(null);
+                                }}
+                                variant="primary"
+                            >
+                                <BsFillBookmarkFill />
+                            </Button>
+                        ) : (
+                            <>
+                                <Button
+                                    size="sm"
+                                    onClick={async () => {
+                                        setUpdateCategory(c.category);
+                                        setUpdateId(c._id);
+                                    }}
+                                    variant="dark"
+                                >
+                                    <BsGear />
+                                </Button>
+                            </>
+                        )}
+                        {c._id === updateId ? (
+                            <Button
+                                size="sm"
+                                onClick={async () => {
+                                    setUpdateId(null);
+                                }}
+                                variant="warning"
+                            >
+                                <BsFillXCircleFill />
+                            </Button>
+                        ) : (
+                            <Button
+                                size="sm"
+                                onClick={async () => {
+                                    let resp = await fetch(`${categoryUrl}/${c._id}`, {
+                                        method: "delete",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            id: c._id,
+                                        }),
+                                    });
+                                    console.log(resp);
+                                    resp = await resp.text();
+                                    console.log("Deleted successfully", resp);
+                                    fetchData();
+                                }}
+                                variant="danger"
+                            >
+                                <BsFillTrashFill />
+                            </Button>
+                        )}
+                    </Col>
+                </Row>
+            ))}
+            <Row className="align-items-center">
+                <Col sm={4} style={{ fontWeight: "bold" }}>
+                    Neue Kategorie
+                </Col>
+                <Col sm={6}>
+                    <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}></input>
+                </Col>
+                <Col sm={2}>
+                    <Button
+                        size="sm"
+                        onClick={async () => {
+                            console.log(newCategory);
+
+                            let resp = await fetch(categoryUrl, {
+                                method: "post",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    category: newCategory,
+                                }),
+                            });
+                            console.log(resp);
+                            resp = await resp.text();
+                            console.log("Posted successfully", resp);
+
+                            // posting
+                            setNewCategory("");
+                            fetchData();
                         }}
+                        variant="primary"
                     >
-                        Kategoriename {sort.name === "category" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>}
-                    </Col>
-                    <Col sm={4}></Col>
-                </Row>
-                {categories.map((c) => (
-                    <Row key={c._id} className="align-items-center">
-                        {/* <Col sm={4}>{c._id}</Col> */}
-                        <Col sm={4}>
-                            {c._id === updateId ? <input onChange={(e) => setUpdateCategory(e.target.value)} value={updateCategory}></input> : c.category}
-                        </Col>
-                        <Col sm={4}>
-                            {c._id === updateId ? (
-                                <Button
-                                    size="sm"
-                                    onClick={async () => {
-                                        let resp = await fetch(`${categoryUrl}/${c._id}`, {
-                                            method: "put",
-                                            headers: {
-                                                "Content-Type": "application/json",
-                                            },
-                                            body: JSON.stringify({
-                                                id: c._id,
-                                                category: updateCategory,
-                                            }),
-                                        });
-                                        console.log(resp);
-                                        resp = await resp.text();
-                                        console.log("Updated successfully", resp);
-                                        fetchData();
-                                        setUpdateId(null);
-                                    }}
-                                    variant="primary"
-                                >
-                                    <BsFillBookmarkFill />
-                                </Button>
-                            ) : (
-                                <>
-                                    <Button
-                                        size="sm"
-                                        onClick={async () => {
-                                            setUpdateCategory(c.category);
-                                            setUpdateId(c._id);
-                                        }}
-                                        variant="dark"
-                                    >
-                                        <BsGear />
-                                    </Button>
-                                </>
-                            )}
-                            {c._id === updateId ? (
-                                <Button
-                                    size="sm"
-                                    onClick={async () => {
-                                        setUpdateId(null);
-                                    }}
-                                    variant="warning"
-                                >
-                                    <BsFillXCircleFill />
-                                </Button>
-                            ) : (
-                                <Button
-                                    size="sm"
-                                    onClick={async () => {
-                                        let resp = await fetch(`${categoryUrl}/${c._id}`, {
-                                            method: "delete",
-                                            headers: {
-                                                "Content-Type": "application/json",
-                                            },
-                                            body: JSON.stringify({
-                                                id: c._id,
-                                            }),
-                                        });
-                                        console.log(resp);
-                                        resp = await resp.text();
-                                        console.log("Deleted successfully", resp);
-                                        fetchData();
-                                    }}
-                                    variant="danger"
-                                >
-                                    <BsFillTrashFill />
-                                </Button>
-                            )}
-                        </Col>
-                    </Row>
-                ))}
-                <Row className="align-items-center">
-                    <Col sm={4} style={{ fontWeight: "bold" }}>
-                        Neue Kategorie
-                    </Col>
-                    <Col sm={4}>
-                        <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}></input>
-                    </Col>
-                    <Col sm={4}>
-                        <Button
-                            size="sm"
-                            onClick={async () => {
-                                console.log(newCategory);
-
-                                let resp = await fetch(categoryUrl, {
-                                    method: "post",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify({
-                                        category: newCategory,
-                                    }),
-                                });
-                                console.log(resp);
-                                resp = await resp.text();
-                                console.log("Posted successfully", resp);
-
-                                // posting
-                                setNewCategory("");
-                                fetchData();
-                            }}
-                            variant="primary"
-                        >
-                            <BsFillBookmarkFill />
-                        </Button>
-                    </Col>
-                </Row>
-            </Container>
-        </>
+                        <BsFillBookmarkFill />
+                    </Button>
+                </Col>
+            </Row>
+        </Container>
     );
 }

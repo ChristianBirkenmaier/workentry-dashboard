@@ -55,7 +55,7 @@
     cursor: pointer;
 }
 
-.data-container .filter-button {
+.data-header .filter-button {
     width: auto;
     padding: 12px;
     margin: 0;
@@ -77,7 +77,7 @@
     width: 25%;
 }
 
-.data-container .dropdown-toggle::after {
+.data-header .dropdown-toggle::after {
     display: unset;
     margin-left: unset;
     vertical-align: unset;
@@ -91,4 +91,12 @@
 .data-container .dropdown-menu {
     max-height: 400px;
     overflow: auto;
+}
+
+.data-row .filter-button {
+    margin: 0;
+}
+
+.data-row div {
+    text-align: center;
 }
