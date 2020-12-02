@@ -3,6 +3,8 @@ import { PROD_WORKENTRY_API, DEV_WORKENTRY_API, PROD_PROJECT_API, DEV_PROJECT_AP
 import { Col, Container, Row, Button, FormControl, InputGroup, Dropdown, ButtonGroup } from "react-bootstrap";
 import sortList from "../../helpers";
 import { BsFillTrashFill, BsGear, BsFillBookmarkFill, BsFillXCircleFill } from "react-icons/bs";
+import moment from "moment";
+import { CSVLink, CSVDownload } from "react-csv";
 
 const sortAlphaDownIcon = () => (
     <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-sort-alpha-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -51,6 +53,15 @@ const filterIcon = () => (
         />
     </svg>
 );
+
+const csvHeaders = [
+    { label: "Projekt", key: "project.project" },
+    { label: "Kategorie", key: "category.category" },
+    { label: "Kommentar", key: "optionalText" },
+    { label: "Von", key: "fromDate" },
+    { label: "Bis", key: "untilDate" },
+    { label: "Extern", key: "external" },
+];
 
 export default function Workentry({ isDev }) {
     let [workentries, setWorkentries] = useState([]);
@@ -446,29 +457,22 @@ export default function Workentry({ isDev }) {
                             {sort.name === "duration" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
                         </Button>
                     </Dropdown>
-                    {/* <Dropdown>
-                        <Dropdown.Toggle variant="light" className="filter-button">
-                            Dauer
+                </Col>
+                <Col className="list-header-row" sm={2}>
+                    <Dropdown as={ButtonGroup} className="w-100">
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Download
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <FormControl
-                                autoFocus
-                                className="mx-3 my-2 w-auto"
-                                placeholder="Type to filter..."
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
-                            />
-                            <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
+                            <Dropdown.Item eventKey="1">
+                                <CSVLink data={workentries} headers={csvHeaders}>
+                                    Download
+                                </CSVLink>
                             </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
                         </Dropdown.Menu>
-                    </Dropdown> */}
+                    </Dropdown>
                 </Col>
-                <Col className="list-header-row" sm={2}></Col>
             </Row>
             {/* <Row>
                 <Col sm={1} className="m-0 p-0">
@@ -584,16 +588,19 @@ export default function Workentry({ isDev }) {
                         {!!updateData && w._id === updateData._id ? (
                             <InputGroup>
                                 <FormControl
-                                    value={updateData.fromDate}
+                                    // value={updateData.fromDate}
+                                    value={moment(updateData.fromDate).format("YYYY.MM.DD kk:mm")}
+                                    // moment(updateData.fromDate).format("YYYY.MM.DD kk:mm")
                                     onChange={(e) => setUpdateData({ ...updateData, fromDate: e.target.value })}
                                 ></FormControl>
                                 <FormControl
-                                    value={updateData.untilDate}
+                                    // value={updateData.untilDate}
+                                    value={moment(updateData.untilDate).format("YYYY.MM.DD kk:mm")}
                                     onChange={(e) => setUpdateData({ ...updateData, untilDate: e.target.value })}
                                 ></FormControl>
                             </InputGroup>
                         ) : (
-                            `${w.fromDate} - ${w.untilDate}`
+                            `${moment(w.fromDate, "HH:mm").format("DD.MM.YYYY kk:mm")} - ${moment(w.untilDate, "HH:mm").format("DD.MM.YYYY kk:mm")}`
                         )}
                     </Col>
                     <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
