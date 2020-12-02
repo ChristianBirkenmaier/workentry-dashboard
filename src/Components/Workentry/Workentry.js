@@ -148,6 +148,10 @@ export default function Workentry({ isDev }) {
     }
 
     function calculateDuration(t1, t2) {
+        if (!t1 || !t2) {
+            console.log("calcularteDuration", t1, t2);
+            return `Fehlerhafte Dauer`;
+        }
         let [hours, minutes] = t1.split(":");
         let [hours2, minutes2] = t2.split(":");
         hours = hours * 60;
@@ -163,7 +167,12 @@ export default function Workentry({ isDev }) {
 
     async function handleUpdate() {
         console.log("handleUpdate", updateData);
-        return;
+        const { _id, category, project, fromDate, untilDate, optionalText } = updateData;
+        if (!_id || !category || !category._id || !project || !project._id || !fromDate || !untilDate) {
+            alert("Fehlerhafte Dateneingabe, überprüfe auf benötigte Eingaben");
+            setUpdateData(null);
+            return;
+        }
         let resp = await fetch(`${workentryUrl}/${updateData._id}`, {
             method: "put",
             headers: {
@@ -171,10 +180,10 @@ export default function Workentry({ isDev }) {
             },
             body: JSON.stringify({
                 id: updateData._id,
-                category: updateData.category,
-                project: updateData.project,
+                category: updateData.category._id,
+                project: updateData.project._id,
                 fromDate: updateData.fromDate,
-                untilDate: updateData.untilData,
+                untilDate: updateData.untilDate,
                 optionalText: updateData.optionalText,
             }),
         });
