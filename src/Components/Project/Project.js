@@ -139,7 +139,7 @@ export default function Project({ isDev }) {
             ))}
             <Row className="align-items-center">
                 <Col sm={4} style={{ fontWeight: "bold" }}>
-                    Neue Kategorie
+                    Neues Projekt
                 </Col>
                 <Col sm={6}>
                     <input value={newProject} onChange={(e) => setNewProject(e.target.value)}></input>

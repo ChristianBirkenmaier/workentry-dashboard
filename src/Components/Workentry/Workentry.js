@@ -38,6 +38,15 @@ const sortNumericUpIcon = () => (
     </svg>
 );
 
+const CheckIcon = () => (
+    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path
+            fillRule="evenodd"
+            d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"
+        />
+    </svg>
+);
+
 const filterIcon = () => (
     // <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-filter-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     //     <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
@@ -221,15 +230,7 @@ export default function Workentry({ isDev }) {
                                 placeholder="Type to filter..."
                                 value={filter ? (filter.filterRubric === "project" ? filter.filterText : "") : ""}
                                 onChange={(e) => setFilter({ filterRubric: "project", filterText: e.target.value })}
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
                             />
-                            {/* <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item> */}
                             <Dropdown.Item onClick={() => setFilter(null)}>Reset Filter X</Dropdown.Item>
                             {projects.map((p) => (
                                 <Dropdown.Item eventKey={p._id} onClick={() => setFilter({ filterRubric: "project", filterText: p.project })}>
@@ -244,18 +245,11 @@ export default function Workentry({ isDev }) {
                                 setSort({ name: "project.project", asc: sort.asc ? !sort.asc : true });
                             }}
                         >
-                            {/* {sort.name === "project.project" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>} */}
                             {sort.name === "project.project" ? (sort.asc ? sortAlphaUpIcon() : sortAlphaDownIcon()) : sortAlphaUpIcon()}
                         </Button>
                     </Dropdown>
                 </Col>
-                <Col
-                    className="list-header-row"
-                    // onClick={() => {
-                    //     setSort({ name: "category.category", asc: sort.asc ? !sort.asc : true });
-                    // }}
-                    sm={2}
-                >
+                <Col className="list-header-row" sm={2}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-75" variant="light">
                             Kategorie
@@ -268,8 +262,6 @@ export default function Workentry({ isDev }) {
                                 placeholder="Type to filter..."
                                 value={filter ? (filter.filterRubric === "category" ? filter.filterText : "") : ""}
                                 onChange={(e) => setFilter({ filterRubric: "category", filterText: e.target.value })}
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
                             />
                             <Dropdown.Item onClick={() => setFilter(null)}>Reset Filter X</Dropdown.Item>
                             {categories.map((c) => (
@@ -277,12 +269,6 @@ export default function Workentry({ isDev }) {
                                     {c.category}
                                 </Dropdown.Item>
                             ))}
-                            {/* <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item> */}
                         </Dropdown.Menu>
                         <Button
                             variant="light"
@@ -294,36 +280,8 @@ export default function Workentry({ isDev }) {
                             {sort.name === "category.category" ? (sort.asc ? sortAlphaUpIcon() : sortAlphaDownIcon()) : sortAlphaUpIcon()}
                         </Button>
                     </Dropdown>
-                    {/* <Dropdown>
-                        <Dropdown.Toggle variant="light" className="filter-button">
-                            Kategorie
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            <FormControl
-                                autoFocus
-                                className="mx-3 my-2 w-auto"
-                                placeholder="Type to filter..."
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
-                            />
-                            <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown> */}
-                    {/* Kategorie {sort.name === "category.category" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>} */}
                 </Col>
-                <Col
-                    className="list-header-row"
-                    // onClick={() => {
-                    //     setSort({ name: "optionalText", asc: sort.asc ? !sort.asc : true });
-                    // }}
-                    sm={2}
-                >
+                <Col className="list-header-row" sm={2}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-75" variant="light">
                             Kommentar
@@ -349,28 +307,6 @@ export default function Workentry({ isDev }) {
                             {sort.name === "optionalText" ? (sort.asc ? sortAlphaUpIcon() : sortAlphaDownIcon()) : sortAlphaUpIcon()}
                         </Button>
                     </Dropdown>
-                    {/* <Dropdown>
-                        <Dropdown.Toggle variant="light" className="filter-button">
-                            Kommentar
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            <FormControl
-                                autoFocus
-                                className="mx-3 my-2 w-auto"
-                                placeholder="Type to filter..."
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
-                            />
-                            <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown> */}
-                    {/* Kommentar {sort.name === "optionalText" ? sort.asc ? <span>▲</span> : <span>▼</span> : <span>▵</span>} */}
                 </Col>
                 <Col className="list-header-row" sm={2}>
                     <Dropdown as={ButtonGroup} className="w-100">
@@ -378,21 +314,6 @@ export default function Workentry({ isDev }) {
                             Von - Bis
                         </Dropdown.Toggle>
 
-                        {/* <Dropdown.Menu>
-                            <FormControl
-                                autoFocus
-                                className="mx-3 my-2 w-auto"
-                                placeholder="Type to filter..."
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
-                            />
-                            <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
-                        </Dropdown.Menu> */}
                         <Button
                             variant="light"
                             className="filter-button w-25"
@@ -403,28 +324,6 @@ export default function Workentry({ isDev }) {
                             {sort.name === "fromDate" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
                         </Button>
                     </Dropdown>
-                    {/* Von - Bis */}
-                    {/* <Dropdown>
-                        <Dropdown.Toggle variant="light" className="filter-button">
-                            Von - Bis
-                        </Dropdown.Toggle>
-
-                        <Dropdown.Menu>
-                            <FormControl
-                                autoFocus
-                                className="mx-3 my-2 w-auto"
-                                placeholder="Type to filter..."
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
-                            />
-                            <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown> */}
                 </Col>
                 <Col className="list-header-row" sm={2}>
                     <Dropdown as={ButtonGroup} className="w-100">
@@ -433,13 +332,7 @@ export default function Workentry({ isDev }) {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <FormControl
-                                autoFocus
-                                className="mx-3 my-2 w-auto"
-                                placeholder="Type to filter..."
-                                // onChange={(e) => setValue(e.target.value)}
-                                // value={value}
-                            />
+                            <FormControl autoFocus className="mx-3 my-2 w-auto" placeholder="Type to filter..." />
                             <Dropdown.Item eventKey="1">Red</Dropdown.Item>
                             <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
                             <Dropdown.Item eventKey="3" active>
@@ -458,7 +351,16 @@ export default function Workentry({ isDev }) {
                         </Button>
                     </Dropdown>
                 </Col>
-                <Col className="list-header-row" sm={2}>
+                <Col className="list-header-row" sm={1}>
+                    <Dropdown as={ButtonGroup} className="w-100">
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Extern
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu></Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+                <Col className="list-header-row" sm={1}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-100" variant="light">
                             Download
@@ -612,22 +514,31 @@ export default function Workentry({ isDev }) {
                             calculateDuration(w.fromDate, w.untilDate)
                         )}
                     </Col>
-                    <Col sm={2}>
+                    <Col sm={1}>{w.external ? CheckIcon() : ""}</Col>
+                    <Col sm={1}>
                         {/* <Button variant="danger" size="sm" onClick={() => handleDelete(w._id)}>
               <BsFillTrashFill />
             </Button> */}
                         {!!updateData && w._id === updateData._id ? (
-                            <Button size="sm" onClick={handleUpdate} variant="primary">
-                                <BsFillBookmarkFill />
-                            </Button>
+                            <ButtonGroup>
+                                <Button onClick={handleUpdate} variant="primary">
+                                    <BsFillBookmarkFill />
+                                </Button>
+                                <Button onClick={async () => setUpdateData(null)} variant="warning">
+                                    <BsFillXCircleFill />
+                                </Button>
+                            </ButtonGroup>
                         ) : (
-                            <>
-                                <Button size="sm" onClick={async () => setUpdateData({ ...w })} variant="dark">
+                            <ButtonGroup>
+                                <Button onClick={async () => setUpdateData({ ...w })} variant="dark">
                                     <BsGear />
                                 </Button>
-                            </>
+                                <Button onClick={async () => handleDelete(w._id)} variant="danger">
+                                    <BsFillTrashFill />
+                                </Button>
+                            </ButtonGroup>
                         )}
-                        {!!updateData && w._id === updateData._id ? (
+                        {/* {!!updateData && w._id === updateData._id ? (
                             <Button size="sm" onClick={async () => setUpdateData(null)} variant="warning">
                                 <BsFillXCircleFill />
                             </Button>
@@ -635,7 +546,7 @@ export default function Workentry({ isDev }) {
                             <Button size="sm" onClick={async () => handleDelete(w._id)} variant="danger">
                                 <BsFillTrashFill />
                             </Button>
-                        )}
+                        )} */}
                     </Col>
                 </Row>
             ))}
