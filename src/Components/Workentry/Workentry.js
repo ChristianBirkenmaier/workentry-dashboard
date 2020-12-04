@@ -75,21 +75,30 @@ const csvHeaders = [
 export default function Workentry({ isDev }) {
     let [workentries, setWorkentries] = useState([]);
     let [filteredWorkentries, setFilteredWorkentries] = useState([]);
-    const [workentryUrl, setWorkentryUrl] = useState(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
-    const [categoryUrl, setCategoryUrl] = useState(isDev ? DEV_CATEGORY_API : PROD_CATEGORY_API);
-    const [projectUrl, setProjectUrl] = useState(isDev ? DEV_PROJECT_API : PROD_PROJECT_API);
     let [categories, setCategories] = useState([]);
     let [projects, setProjects] = useState([]);
     let [filter, setFilter] = useState({ filterRubric: null, filterText: null });
     let [updateData, setUpdateData] = useState(null);
 
+    const DEV_URLS = { workentryUrl: DEV_WORKENTRY_API, categoryUrl: DEV_CATEGORY_API, projectUrl: DEV_PROJECT_API };
+    const PROD_URLS = {
+        workentryUrl: PROD_WORKENTRY_API,
+        categoryUrl: PROD_CATEGORY_API,
+        projectUrl: PROD_PROJECT_API,
+    };
+
+    const [urls, setUrls] = useState(isDev ? DEV_URLS : PROD_URLS);
+
     let [sort, setSort] = useState({ name: "category.category", asc: false });
 
     async function fetchData() {
         try {
-            console.log(`Fetching from ${workentryUrl}`);
-            // let workentries = await fetch(workentryUrl);
-            let [fetched_projects, workentries, fetched_categories] = await Promise.all([fetch(projectUrl), fetch(workentryUrl), fetch(categoryUrl)]);
+            console.log(`Fetching from ${JSON.stringify(urls)}`);
+            let [fetched_projects, workentries, fetched_categories] = await Promise.all([
+                fetch(urls.projectUrl),
+                fetch(urls.workentryUrl),
+                fetch(urls.categoryUrl),
+            ]);
             workentries = await workentries.json();
             fetched_categories = await fetched_categories.json();
             // console.dir(`Successfully fetched, data recieved: ${JSON.stringify(workentries)}`);
@@ -116,12 +125,15 @@ export default function Workentry({ isDev }) {
     }, [sort]);
 
     useEffect(() => {
-        setWorkentryUrl(isDev ? DEV_WORKENTRY_API : PROD_WORKENTRY_API);
+        console.log("isDev changed");
+        setUrls(isDev ? { ...DEV_URLS } : { ...PROD_URLS });
     }, [isDev]);
 
     useEffect(() => {
+        console.log("urls changed");
+        console.log("urls", urls);
         fetchData();
-    }, [workentryUrl]);
+    }, [urls]);
 
     useEffect(() => {
         if (filter === null) {
@@ -146,7 +158,7 @@ export default function Workentry({ isDev }) {
 
     async function handleDelete(id) {
         try {
-            await fetch(`${workentryUrl}/${id}`, { method: "DELETE" });
+            await fetch(`${urls.workentryUrl}/${id}`, { method: "DELETE" });
             fetchData();
 
             //   let resp = await fetch(`${workentryUrl}/${w._id}`, {
@@ -187,24 +199,25 @@ export default function Workentry({ isDev }) {
 
     async function handleUpdate() {
         console.log("handleUpdate", updateData);
-        const { _id, category, project, fromDate, untilDate, optionalText } = updateData;
-        if (!_id || !category || !category._id || !project || !project._id || !fromDate || !untilDate) {
+        const { _id, category, project, fromDate, untilDate, optionalText, date, start, end } = updateData;
+        if (!_id || !category || !category._id || !project || !project._id || !start || !end) {
             alert("Fehlerhafte Dateneingabe, überprüfe auf benötigte Eingaben");
             setUpdateData(null);
             return;
         }
-        let resp = await fetch(`${workentryUrl}/${updateData._id}`, {
+        let resp = await fetch(`${urls.workentryUrl}/${updateData._id}`, {
             method: "put",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                id: updateData._id,
-                category: updateData.category._id,
-                project: updateData.project._id,
-                fromDate: updateData.fromDate,
-                untilDate: updateData.untilDate,
-                optionalText: updateData.optionalText,
+                id: _id,
+                category: category._id,
+                project: project._id,
+                start,
+                end,
+                date,
+                optionalText,
             }),
         });
         console.log(resp);
@@ -308,24 +321,58 @@ export default function Workentry({ isDev }) {
                         </Button>
                     </Dropdown>
                 </Col>
-                <Col className="list-header-row" sm={2}>
+                <Col className="list-header-row" sm={1}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Von - Bis
+                            Datum
                         </Dropdown.Toggle>
 
                         <Button
                             variant="light"
                             className="filter-button w-25"
                             onClick={() => {
-                                setSort({ name: "fromDate", asc: sort.asc ? !sort.asc : true });
+                                setSort({ name: "date", asc: sort.asc ? !sort.asc : true });
                             }}
                         >
-                            {sort.name === "fromDate" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
+                            {sort.name === "date" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
                         </Button>
                     </Dropdown>
                 </Col>
-                <Col className="list-header-row" sm={2}>
+                <Col className="list-header-row" sm={1}>
+                    <Dropdown as={ButtonGroup} className="w-100">
+                        <Dropdown.Toggle className="filter-button w-75" variant="light">
+                            Von
+                        </Dropdown.Toggle>
+
+                        <Button
+                            variant="light"
+                            className="filter-button w-25"
+                            onClick={() => {
+                                setSort({ name: "start", asc: sort.asc ? !sort.asc : true });
+                            }}
+                        >
+                            {sort.name === "start" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
+                        </Button>
+                    </Dropdown>
+                </Col>
+                <Col className="list-header-row" sm={1}>
+                    <Dropdown as={ButtonGroup} className="w-100">
+                        <Dropdown.Toggle className="filter-button w-75" variant="light">
+                            Bis
+                        </Dropdown.Toggle>
+
+                        <Button
+                            variant="light"
+                            className="filter-button w-25"
+                            onClick={() => {
+                                setSort({ name: "end", asc: sort.asc ? !sort.asc : true });
+                            }}
+                        >
+                            {sort.name === "end" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
+                        </Button>
+                    </Dropdown>
+                </Col>
+                <Col className="list-header-row" sm={1}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-75" variant="light">
                             Dauer
@@ -376,51 +423,6 @@ export default function Workentry({ isDev }) {
                     </Dropdown>
                 </Col>
             </Row>
-            {/* <Row>
-                <Col sm={1} className="m-0 p-0">
-          <InputGroup className="">
-            <FormControl
-              value={filter ? (filter.filterRubric === "id" ? filter.filterText : "") : ""}
-              onChange={(e) => setFilter({ filterRubric: "id", filterText: e.target.value })}
-              placeholder="id"
-              aria-label="id"
-            />
-          </InputGroup>
-        </Col>
-                <Col className="m-0 p-0" sm={2}>
-                    <InputGroup className="">
-                        <FormControl
-                            placeholder="project"
-                            aria-label="project"
-                            value={filter ? (filter.filterRubric === "project" ? filter.filterText : "") : ""}
-                            onChange={(e) => setFilter({ filterRubric: "project", filterText: e.target.value })}
-                        />
-                    </InputGroup>
-                </Col>
-                <Col className="m-0 p-0" sm={2}>
-                    <InputGroup className="">
-                        <FormControl
-                            value={filter ? (filter.filterRubric === "category" ? filter.filterText : "") : ""}
-                            onChange={(e) => setFilter({ filterRubric: "category", filterText: e.target.value })}
-                            placeholder="category"
-                            aria-label="category"
-                        />
-                    </InputGroup>
-                </Col>
-                <Col className="m-0 p-0" sm={4}>
-                    <InputGroup className="">
-                        <FormControl
-                            value={filter ? (filter.filterRubric === "optionalText" ? filter.filterText : "") : ""}
-                            onChange={(e) => setFilter({ filterRubric: "optionalText", filterText: e.target.value })}
-                            placeholder="optionalText"
-                            aria-label="optionalText"
-                        />
-                    </InputGroup>
-                </Col>
-                <Col sm={1}></Col>
-                <Col sm={1}></Col>
-                <Col sm={1}></Col>
-            </Row> */}
             {filteredWorkentries.map((w) => (
                 <Row key={w._id} className="align-items-center data-row">
                     <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
@@ -486,39 +488,70 @@ export default function Workentry({ isDev }) {
                             w.optionalText
                         )}
                     </Col>
-                    <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
                         {!!updateData && w._id === updateData._id ? (
                             <InputGroup>
                                 <FormControl
-                                    // value={updateData.fromDate}
-                                    value={moment(updateData.fromDate).format("YYYY.MM.DD kk:mm")}
-                                    // moment(updateData.fromDate).format("YYYY.MM.DD kk:mm")
-                                    onChange={(e) => setUpdateData({ ...updateData, fromDate: e.target.value })}
-                                ></FormControl>
-                                <FormControl
-                                    // value={updateData.untilDate}
-                                    value={moment(updateData.untilDate).format("YYYY.MM.DD kk:mm")}
-                                    onChange={(e) => setUpdateData({ ...updateData, untilDate: e.target.value })}
+                                    type="date"
+                                    value={updateData.date}
+                                    onChange={(e) => setUpdateData({ ...updateData, date: e.target.value })}
                                 ></FormControl>
                             </InputGroup>
                         ) : (
-                            `${moment(w.fromDate, "HH:mm").format("DD.MM.YYYY kk:mm")} - ${moment(w.untilDate, "HH:mm").format("DD.MM.YYYY kk:mm")}`
+                            `${w.date ? w.date : "Unbekanntes Datum"}`
                         )}
                     </Col>
-                    <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
                         {!!updateData && w._id === updateData._id ? (
                             <InputGroup>
-                                <FormControl disabled value={calculateDuration(w.fromDate, w.untilDate)}></FormControl>
+                                <FormControl
+                                    type="time"
+                                    value={updateData.start ? updateData.start : updateData.fromDate ? updateData.fromDate : ""}
+                                    onChange={(e) => setUpdateData({ ...updateData, start: e.target.value })}
+                                ></FormControl>
                             </InputGroup>
                         ) : (
+                            `${w.start ? w.start : w.fromDate ? w.fromDate : "Unbekannte Uhrzeit"}`
+                        )}
+                    </Col>
+                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                        {!!updateData && w._id === updateData._id ? (
+                            <InputGroup>
+                                <FormControl
+                                    type="time"
+                                    value={updateData.end ? updateData.end : updateData.untilDate ? updateData.untilDate : ""}
+                                    onChange={(e) => setUpdateData({ ...updateData, end: e.target.value })}
+                                ></FormControl>
+                            </InputGroup>
+                        ) : (
+                            `${w.end ? w.end : w.untilDate ? w.untilDate : "Unbekannte Uhrzeit"}`
+                        )}
+                    </Col>
+                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                        {!!updateData && w._id === updateData._id ? (
+                            <InputGroup>
+                                <FormControl
+                                    type="number"
+                                    disabled
+                                    value={
+                                        w.start && w.end
+                                            ? calculateDuration(w.start, w.end)
+                                            : w.fromDate && w.untilDate
+                                            ? calculateDuration(w.fromDate, w.untilDate)
+                                            : "Keine Dauer verfügbar"
+                                    }
+                                ></FormControl>
+                            </InputGroup>
+                        ) : w.start && w.end ? (
+                            calculateDuration(w.start, w.end)
+                        ) : w.fromDate && w.untilDate ? (
                             calculateDuration(w.fromDate, w.untilDate)
+                        ) : (
+                            "Keine Dauer verfügbar"
                         )}
                     </Col>
                     <Col sm={1}>{w.external ? CheckIcon() : ""}</Col>
                     <Col sm={1}>
-                        {/* <Button variant="danger" size="sm" onClick={() => handleDelete(w._id)}>
-              <BsFillTrashFill />
-            </Button> */}
                         {!!updateData && w._id === updateData._id ? (
                             <ButtonGroup>
                                 <Button onClick={handleUpdate} variant="primary">
@@ -538,44 +571,9 @@ export default function Workentry({ isDev }) {
                                 </Button>
                             </ButtonGroup>
                         )}
-                        {/* {!!updateData && w._id === updateData._id ? (
-                            <Button size="sm" onClick={async () => setUpdateData(null)} variant="warning">
-                                <BsFillXCircleFill />
-                            </Button>
-                        ) : (
-                            <Button size="sm" onClick={async () => handleDelete(w._id)} variant="danger">
-                                <BsFillTrashFill />
-                            </Button>
-                        )} */}
                     </Col>
                 </Row>
             ))}
         </Container>
-        // <Table striped bordered hover variant="light" size="sm" style={{ tableLayout: "fixed" }}>
-        //   <thead>
-        //     <tr>
-        //       <th>#</th>
-        //       <th>Project</th>
-        //       <th>Category</th>
-        //       <th>Optional</th>
-        //       <th>Start</th>
-        //       <th>End</th>
-        //     </tr>
-        //   </thead>
-        //   <tbody>
-        //     {workentries.map((w) => {
-        //       return (
-        //         <tr key={w._id}>
-        //           <td>{w._id.substring(0, 8)}</td>
-        //           <td>{w.project ? w.project.project : "Unbekanntes Projekt"}</td>
-        //           <td>{w.category ? w.category.category : "Unbekannte Kategorie"}</td>
-        //           <td>{w.optionalText}</td>
-        //           <td>{w.fromDate}</td>
-        //           <td>{w.untilDate}</td>
-        //         </tr>
-        //       );
-        //     })}
-        //   </tbody>
-        // </Table>
     );
 }
