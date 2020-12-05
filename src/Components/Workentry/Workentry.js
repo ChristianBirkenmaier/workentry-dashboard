@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { PROD_WORKENTRY_API, DEV_WORKENTRY_API, PROD_PROJECT_API, DEV_PROJECT_API, PROD_CATEGORY_API, DEV_CATEGORY_API } from "../../config/api.json";
-import { Col, Container, Row, Button, FormControl, InputGroup, Dropdown, ButtonGroup } from "react-bootstrap";
+import { Col, Container, Row, Button, FormControl, InputGroup, Dropdown, ButtonGroup, Form } from "react-bootstrap";
 import sortList from "../../helpers";
 import { BsFillTrashFill, BsGear, BsFillBookmarkFill, BsFillXCircleFill } from "react-icons/bs";
 import moment from "moment";
@@ -46,6 +46,27 @@ const CheckIcon = () => (
         />
     </svg>
 );
+const ResetIcon = () => (
+    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path
+            fillRule="evenodd"
+            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
+        />
+    </svg>
+);
+
+const DownloadIcon = () => (
+    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path
+            fillRule="evenodd"
+            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
+        />
+        <path
+            fillRule="evenodd"
+            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"
+        />
+    </svg>
+);
 
 const filterIcon = () => (
     // <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-filter-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -67,14 +88,17 @@ const csvHeaders = [
     { label: "Projekt", key: "project.project" },
     { label: "Kategorie", key: "category.category" },
     { label: "Kommentar", key: "optionalText" },
+    { label: "Datum", key: "date" },
     { label: "Von", key: "fromDate" },
+    { label: "Von", key: "start" },
     { label: "Bis", key: "untilDate" },
+    { label: "Bis", key: "end" },
     { label: "Extern", key: "external" },
 ];
 
 export default function Workentry({ isDev }) {
     let [workentries, setWorkentries] = useState([]);
-    let [filteredWorkentries, setFilteredWorkentries] = useState([]);
+    // let [filteredWorkentries, setFilteredWorkentries] = useState([]);
     let [categories, setCategories] = useState([]);
     let [projects, setProjects] = useState([]);
     let [filter, setFilter] = useState({ filterRubric: null, filterText: null });
@@ -112,16 +136,17 @@ export default function Workentry({ isDev }) {
             setWorkentries([]);
         }
     }
-    useEffect(() => {
-        fetchData();
+    useEffect(async () => {
+        await fetchData();
+        setFilter({ filterRubric: "date", filterText: moment().format("YYYY-MM-DD") });
     }, []);
     useEffect(() => {
-        setFilteredWorkentries(workentries);
+        setWorkentries(workentries);
     }, [workentries]);
 
     useEffect(() => {
         console.log("useEffect sort");
-        setFilteredWorkentries(sortList(sort, workentries));
+        setWorkentries(sortList(sort, workentries));
     }, [sort]);
 
     useEffect(() => {
@@ -135,45 +160,36 @@ export default function Workentry({ isDev }) {
         fetchData();
     }, [urls]);
 
-    useEffect(() => {
-        if (filter === null) {
-            return setFilteredWorkentries(workentries);
+    function _filter(itemToFilter) {
+        if (filter === null || filter.filterRubric === null || filter.filterText === null) {
+            console.log("empty filter");
+            return true;
         }
-        let filteredWorkentries = [];
         switch (filter.filterRubric) {
             case "project":
-                filteredWorkentries = workentries.filter((x) => x && x.project && x.project.project.includes(filter.filterText));
-                break;
+                return itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filter.filterText);
             case "category":
-                filteredWorkentries = workentries.filter((x) => x && x.category && x.category.category.includes(filter.filterText));
-                break;
-            case "id":
-                filteredWorkentries = workentries.filter((x) => x && x._id && x._id.includes(filter.filterText));
-                break;
+                return itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filter.filterText);
             case "optionalText":
-                filteredWorkentries = workentries.filter((x) => x && x.optionalText && x.optionalText.includes(filter.filterText));
+                return itemToFilter.optionalText && itemToFilter.optionalText.includes(filter.filterText);
+            case "date":
+                return itemToFilter.date && itemToFilter.date.includes(filter.filterText);
+            case "external":
+                return itemToFilter.external && itemToFilter.external === filter.filterText;
+            default:
+                console.log("filter default case, maybe something's wrong here");
+                return true;
         }
-        setFilteredWorkentries(filteredWorkentries);
+    }
+
+    useEffect(() => {
+        setWorkentries(workentries);
     }, [filter]);
 
     async function handleDelete(id) {
         try {
             await fetch(`${urls.workentryUrl}/${id}`, { method: "DELETE" });
             fetchData();
-
-            //   let resp = await fetch(`${workentryUrl}/${w._id}`, {
-            //     method: "delete",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //         id: w._id,
-            //     }),
-            // });
-            // console.log(resp);
-            // resp = await resp.text();
-            // console.log("Deleted successfully", resp);
-            // fetchData();
         } catch (err) {
             console.error(err);
         }
@@ -199,7 +215,7 @@ export default function Workentry({ isDev }) {
 
     async function handleUpdate() {
         console.log("handleUpdate", updateData);
-        const { _id, category, project, fromDate, untilDate, optionalText, date, start, end } = updateData;
+        const { _id, category, project, fromDate, untilDate, optionalText, date, start, end, external } = updateData;
         if (!_id || !category || !category._id || !project || !project._id || !start || !end) {
             alert("Fehlerhafte Dateneingabe, überprüfe auf benötigte Eingaben");
             setUpdateData(null);
@@ -218,6 +234,7 @@ export default function Workentry({ isDev }) {
                 end,
                 date,
                 optionalText,
+                external,
             }),
         });
         console.log(resp);
@@ -231,8 +248,8 @@ export default function Workentry({ isDev }) {
         <Container fluid className="data-container">
             <Row className="data-header align-items-center">
                 <Col className="list-header-row" sm={2}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
+                    <Dropdown>
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
                             Projekt {filterIcon()}
                         </Dropdown.Toggle>
 
@@ -244,28 +261,45 @@ export default function Workentry({ isDev }) {
                                 value={filter ? (filter.filterRubric === "project" ? filter.filterText : "") : ""}
                                 onChange={(e) => setFilter({ filterRubric: "project", filterText: e.target.value })}
                             />
-                            <Dropdown.Item onClick={() => setFilter(null)}>Reset Filter X</Dropdown.Item>
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "project.project" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "project.project", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "project.project" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "project.project", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
+                            <Dropdown.Item onClick={() => setFilter({ name: "", asc: undefined })}>Reset Filter X</Dropdown.Item>
                             {projects.map((p) => (
                                 <Dropdown.Item eventKey={p._id} onClick={() => setFilter({ filterRubric: "project", filterText: p.project })}>
                                     {p.project}
                                 </Dropdown.Item>
                             ))}
                         </Dropdown.Menu>
-                        <Button
+                        {/* <Button
                             variant="light"
                             className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "project.project", asc: sort.asc ? !sort.asc : true });
-                            }}
+                            onClick={() => setSort({ name: "project.project", asc: sort.asc ? !sort.asc : true })}
                         >
                             {sort.name === "project.project" ? (sort.asc ? sortAlphaUpIcon() : sortAlphaDownIcon()) : sortAlphaUpIcon()}
-                        </Button>
+                        </Button> */}
                     </Dropdown>
                 </Col>
                 <Col className="list-header-row" sm={2}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Kategorie
+                    <Dropdown>
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Kategorie {filterIcon()}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
@@ -276,28 +310,37 @@ export default function Workentry({ isDev }) {
                                 value={filter ? (filter.filterRubric === "category" ? filter.filterText : "") : ""}
                                 onChange={(e) => setFilter({ filterRubric: "category", filterText: e.target.value })}
                             />
-                            <Dropdown.Item onClick={() => setFilter(null)}>Reset Filter X</Dropdown.Item>
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "category.category" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "category.category", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "category.category" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "category.category", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
                             {categories.map((c) => (
                                 <Dropdown.Item eventKey={c._id} onClick={() => setFilter({ filterRubric: "category", filterText: c.category })}>
                                     {c.category}
                                 </Dropdown.Item>
                             ))}
                         </Dropdown.Menu>
-                        <Button
-                            variant="light"
-                            className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "category.category", asc: sort.asc ? !sort.asc : true });
-                            }}
-                        >
-                            {sort.name === "category.category" ? (sort.asc ? sortAlphaUpIcon() : sortAlphaDownIcon()) : sortAlphaUpIcon()}
-                        </Button>
                     </Dropdown>
                 </Col>
                 <Col className="list-header-row" sm={2}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Kommentar
+                    <Dropdown>
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Kommentar {filterIcon()}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
@@ -308,114 +351,225 @@ export default function Workentry({ isDev }) {
                                 value={filter ? (filter.filterRubric === "optionalText" ? filter.filterText : "") : ""}
                                 onChange={(e) => setFilter({ filterRubric: "optionalText", filterText: e.target.value })}
                             />
-                            <Dropdown.Item onClick={() => setFilter(null)}>Reset Filter X</Dropdown.Item>
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "optionalText" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "optionalText", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "optionalText" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "optionalText", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
                         </Dropdown.Menu>
-                        <Button
-                            variant="light"
-                            className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "optionalText", asc: sort.asc ? !sort.asc : true });
-                            }}
-                        >
-                            {sort.name === "optionalText" ? (sort.asc ? sortAlphaUpIcon() : sortAlphaDownIcon()) : sortAlphaUpIcon()}
-                        </Button>
                     </Dropdown>
                 </Col>
                 <Col className="list-header-row" sm={1}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Datum
-                        </Dropdown.Toggle>
-
-                        <Button
-                            variant="light"
-                            className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "date", asc: sort.asc ? !sort.asc : true });
-                            }}
-                        >
-                            {sort.name === "date" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
-                        </Button>
-                    </Dropdown>
-                </Col>
-                <Col className="list-header-row" sm={1}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Von
-                        </Dropdown.Toggle>
-
-                        <Button
-                            variant="light"
-                            className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "start", asc: sort.asc ? !sort.asc : true });
-                            }}
-                        >
-                            {sort.name === "start" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
-                        </Button>
-                    </Dropdown>
-                </Col>
-                <Col className="list-header-row" sm={1}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Bis
-                        </Dropdown.Toggle>
-
-                        <Button
-                            variant="light"
-                            className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "end", asc: sort.asc ? !sort.asc : true });
-                            }}
-                        >
-                            {sort.name === "end" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
-                        </Button>
-                    </Dropdown>
-                </Col>
-                <Col className="list-header-row" sm={1}>
-                    <Dropdown as={ButtonGroup} className="w-100">
-                        <Dropdown.Toggle className="filter-button w-75" variant="light">
-                            Dauer
+                    <Dropdown>
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Datum {filterIcon()}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <FormControl autoFocus className="mx-3 my-2 w-auto" placeholder="Type to filter..." />
-                            <Dropdown.Item eventKey="1">Red</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Blue</Dropdown.Item>
-                            <Dropdown.Item eventKey="3" active>
-                                Orange
-                            </Dropdown.Item>
-                            <Dropdown.Item eventKey="1">Red-Orange</Dropdown.Item>
+                            <FormControl
+                                type="date"
+                                autoFocus
+                                className="mx-3 my-2 w-auto"
+                                // placeholder="Type to filter..."
+                                value={filter ? (filter.filterRubric === "date" ? filter.filterText : "") : ""}
+                                onChange={(e) => setFilter({ filterRubric: "date", filterText: e.target.value })}
+                            />
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "date" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "date", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "date" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "date", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
                         </Dropdown.Menu>
-                        <Button
-                            variant="light"
-                            className="filter-button w-25"
-                            onClick={() => {
-                                setSort({ name: "duration", asc: sort.asc ? !sort.asc : true });
-                            }}
-                        >
-                            {sort.name === "duration" ? (sort.asc ? sortNumericUpIcon() : sortNumericDownIcon()) : sortNumericUpIcon()}
-                        </Button>
                     </Dropdown>
                 </Col>
                 <Col className="list-header-row" sm={1}>
-                    <Dropdown as={ButtonGroup} className="w-100">
+                    <Dropdown>
                         <Dropdown.Toggle className="filter-button w-100" variant="light">
-                            Extern
+                            Von {filterIcon()}
                         </Dropdown.Toggle>
 
-                        <Dropdown.Menu></Dropdown.Menu>
+                        <Dropdown.Menu>
+                            <FormControl
+                                type="text"
+                                autoFocus
+                                className="mx-3 my-2 w-auto"
+                                value={filter ? (filter.filterRubric === "start" ? filter.filterText : "") : ""}
+                                onChange={(e) => setFilter({ filterRubric: "start", filterText: e.target.value })}
+                            />
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "start" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "start", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "start" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "start", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+                <Col className="list-header-row" sm={1}>
+                    <Dropdown>
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Bis {filterIcon()}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            <FormControl
+                                type="text"
+                                autoFocus
+                                className="mx-3 my-2 w-auto"
+                                value={filter ? (filter.filterRubric === "end" ? filter.filterText : "") : ""}
+                                onChange={(e) => setFilter({ filterRubric: "end", filterText: e.target.value })}
+                            />
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "end" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "end", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "end" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "end", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+                <Col className="list-header-row" sm={1}>
+                    <Dropdown>
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Dauer {filterIcon()}
+                        </Dropdown.Toggle>
+
+                        {/* <Dropdown.Menu>
+                            <FormControl
+                                type="text"
+                                autoFocus
+                                className="mx-3 my-2 w-auto"
+                                value={filter ? (filter.filterRubric === "start" ? filter.filterText : "") : ""}
+                                onChange={(e) => setFilter({ filterRubric: "start", filterText: e.target.value })}
+                            />
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "start" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "start", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "start" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "start", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
+                        </Dropdown.Menu> */}
                     </Dropdown>
                 </Col>
                 <Col className="list-header-row" sm={1}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-100" variant="light">
-                            Download
+                            Extern {filterIcon()}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            {/* <FormControl
+                                type="checkbox"
+                                autoFocus
+                                className="mx-3 my-2 w-auto"
+                                checked={filter ? (filter.filterRubric === "external" ? filter.filterText : false) : false}
+                                onChange={(e) => setFilter({ filterRubric: "external", filterText: e.target.checked })}
+                            /> */}
+                            <Form>
+                                <Form.Check
+                                    type="checkbox"
+                                    checked={filter ? (filter.filterRubric === "external" ? filter.filterText : false) : false}
+                                    onChange={(e) => setFilter({ filterRubric: "external", filterText: e.target.checked })}
+                                ></Form.Check>
+                            </Form>
+                            <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
+                                <Button
+                                    className={sort.name === "external" && sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "external", asc: true })}
+                                >
+                                    {sortAlphaUpIcon()}
+                                </Button>
+                                <Button
+                                    className={sort.name === "external" && !sort.asc ? "highlighted" : ""}
+                                    variant="light"
+                                    onClick={() => setSort({ name: "external", asc: false })}
+                                >
+                                    {sortAlphaDownIcon()}
+                                </Button>
+                                <Button variant="light" onClick={() => setFilter(null)}>
+                                    {ResetIcon()}
+                                </Button>
+                            </ButtonGroup>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+                <Col className="list-header-row" sm={1}>
+                    <Dropdown as={ButtonGroup} className="w-100">
+                        <Dropdown.Toggle className="filter-button w-100" variant="light">
+                            Download {DownloadIcon()}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
                             <Dropdown.Item eventKey="1">
-                                <CSVLink data={workentries} headers={csvHeaders}>
+                                <CSVLink data={workentries.filter(_filter)} headers={csvHeaders}>
                                     Download
                                 </CSVLink>
                             </Dropdown.Item>
@@ -423,7 +577,7 @@ export default function Workentry({ isDev }) {
                     </Dropdown>
                 </Col>
             </Row>
-            {filteredWorkentries.map((w) => (
+            {workentries.filter(_filter).map((w) => (
                 <Row key={w._id} className="align-items-center data-row">
                     <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
                         {!!updateData && w._id === updateData._id ? (
@@ -550,7 +704,30 @@ export default function Workentry({ isDev }) {
                             "Keine Dauer verfügbar"
                         )}
                     </Col>
-                    <Col sm={1}>{w.external ? CheckIcon() : ""}</Col>
+                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                        {!!updateData && w._id === updateData._id ? (
+                            <Form>
+                                <Form.Check
+                                    type="checkbox"
+                                    checked={updateData.external}
+                                    onChange={(e) => setUpdateData({ ...updateData, external: e.target.checked })}
+                                ></Form.Check>
+                            </Form>
+                        ) : // <InputGroup className="justify-content-center">
+                        //     <FormControl
+                        //         size="sm"
+                        //         type="checkbox"
+                        //         checked={updateData.external}
+                        //         onChange={(e) => setUpdateData({ ...updateData, external: e.target.checked })}
+                        //     ></FormControl>
+                        //     {/* <InputGroup.Checkbox aria-label="Checkbox for following text input" /> */}
+                        // </InputGroup>
+                        w.external ? (
+                            CheckIcon()
+                        ) : (
+                            ""
+                        )}
+                    </Col>
                     <Col sm={1}>
                         {!!updateData && w._id === updateData._id ? (
                             <ButtonGroup>
