@@ -97,11 +97,21 @@ const csvHeaders = [
 ];
 
 export default function Workentry({ isDev }) {
+    const filterEntries = {
+        project: "",
+        category: "",
+        optionalText: "",
+        date: "",
+        start: "",
+        end: "",
+        duration: "",
+        external: "",
+    };
     let [workentries, setWorkentries] = useState([]);
     // let [filteredWorkentries, setFilteredWorkentries] = useState([]);
     let [categories, setCategories] = useState([]);
     let [projects, setProjects] = useState([]);
-    let [filter, setFilter] = useState({ filterRubric: null, filterText: null });
+    let [filter, setFilter] = useState(filterEntries);
     let [updateData, setUpdateData] = useState(null);
 
     const DEV_URLS = { workentryUrl: DEV_WORKENTRY_API, categoryUrl: DEV_CATEGORY_API, projectUrl: DEV_PROJECT_API };
@@ -137,8 +147,9 @@ export default function Workentry({ isDev }) {
         }
     }
     useEffect(async () => {
+        setFilter({ ...filter, date: moment().format("YYYY-MM-DD") });
         await fetchData();
-        setFilter({ filterRubric: "date", filterText: moment().format("YYYY-MM-DD") });
+        // setFilter({ filterRubric: "date", filterText: moment().format("YYYY-MM-DD") });
     }, []);
     useEffect(() => {
         setWorkentries(workentries);
@@ -160,26 +171,36 @@ export default function Workentry({ isDev }) {
         fetchData();
     }, [urls]);
 
+    useEffect(() => console.log(filter), [filter]);
+
     function _filter(itemToFilter) {
-        if (filter === null || filter.filterRubric === null || filter.filterText === null) {
-            console.log("empty filter");
-            return true;
-        }
-        switch (filter.filterRubric) {
-            case "project":
-                return itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filter.filterText);
-            case "category":
-                return itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filter.filterText);
-            case "optionalText":
-                return itemToFilter.optionalText && itemToFilter.optionalText.includes(filter.filterText);
-            case "date":
-                return itemToFilter.date && itemToFilter.date.includes(filter.filterText);
-            case "external":
-                return itemToFilter.external && itemToFilter.external === filter.filterText;
-            default:
-                console.log("filter default case, maybe something's wrong here");
-                return true;
-        }
+        const filterValues = Object.entries(filter);
+
+        let showItemArray = filterValues.map((fi) => {
+            let [filterType, filterValue] = fi;
+            // console.log("filtertype", filterType, filterValue, itemToFilter);
+            // if (filter === null || filter.filterRubric === null || filter.filterText === null) {
+            //         console.log("empty filter");
+            //         return true;
+            // }
+            switch (filterType) {
+                case "project":
+                    return itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filterValue);
+                case "category":
+                    return itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filterValue);
+                case "optionalText":
+                    return itemToFilter.optionalText.includes(filterValue);
+                case "date":
+                    return itemToFilter.date && itemToFilter.date.includes(filterValue);
+                // case "external":
+                //     return itemToFilter.external && itemToFilter.external === filterValue;
+                default:
+                    // console.log("filter default case, maybe something's wrong here");
+                    return true;
+            }
+        });
+        // console.log(showItemArray);
+        return showItemArray.every((v) => !!v);
     }
 
     useEffect(() => {
@@ -244,8 +265,19 @@ export default function Workentry({ isDev }) {
         setUpdateData(null);
     }
 
+    function showFilterValues() {
+        let filterValues = [];
+        for (const [key, value] of Object.entries(filter)) {
+            if (value !== "") {
+                filterValues.push(`Filter: ${key}, Wert: ${value}`);
+            }
+        }
+        return filterValues;
+    }
+
     return (
         <Container fluid className="data-container">
+            <Row>{`Aktive Filter: ${showFilterValues()}`}</Row>
             <Row className="data-header align-items-center">
                 <Col className="list-header-row" sm={2}>
                     <Dropdown>
@@ -258,8 +290,8 @@ export default function Workentry({ isDev }) {
                                 autoFocus
                                 className="mx-3 my-2 w-auto"
                                 placeholder="Type to filter..."
-                                value={filter ? (filter.filterRubric === "project" ? filter.filterText : "") : ""}
-                                onChange={(e) => setFilter({ filterRubric: "project", filterText: e.target.value })}
+                                value={filter ? filter["project"] : ""}
+                                onChange={(e) => setFilter({ ...filter, project: e.target.value })}
                             />
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
                                 <Button
@@ -276,13 +308,13 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, project: "" })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
-                            <Dropdown.Item onClick={() => setFilter({ name: "", asc: undefined })}>Reset Filter X</Dropdown.Item>
+                            {/* <Dropdown.Item onClick={() => setFilter({ name: "", asc: undefined })}>Reset Filter X</Dropdown.Item> */}
                             {projects.map((p) => (
-                                <Dropdown.Item eventKey={p._id} onClick={() => setFilter({ filterRubric: "project", filterText: p.project })}>
+                                <Dropdown.Item eventKey={p._id} onClick={() => setFilter({ ...filter, project: p.project })}>
                                     {p.project}
                                 </Dropdown.Item>
                             ))}
@@ -307,8 +339,8 @@ export default function Workentry({ isDev }) {
                                 autoFocus
                                 className="mx-3 my-2 w-auto"
                                 placeholder="Type to filter..."
-                                value={filter ? (filter.filterRubric === "category" ? filter.filterText : "") : ""}
-                                onChange={(e) => setFilter({ filterRubric: "category", filterText: e.target.value })}
+                                value={filter ? filter["category"] : ""}
+                                onChange={(e) => setFilter({ ...filter, category: e.target.value })}
                             />
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
                                 <Button
@@ -325,12 +357,12 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, project: "" })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
                             {categories.map((c) => (
-                                <Dropdown.Item eventKey={c._id} onClick={() => setFilter({ filterRubric: "category", filterText: c.category })}>
+                                <Dropdown.Item eventKey={c._id} onClick={() => setFilter({ ...filter, category: c.category })}>
                                     {c.category}
                                 </Dropdown.Item>
                             ))}
@@ -348,8 +380,8 @@ export default function Workentry({ isDev }) {
                                 autoFocus
                                 className="mx-3 my-2 w-auto"
                                 placeholder="Type to filter..."
-                                value={filter ? (filter.filterRubric === "optionalText" ? filter.filterText : "") : ""}
-                                onChange={(e) => setFilter({ filterRubric: "optionalText", filterText: e.target.value })}
+                                value={filter ? filter["optionalText"] : ""}
+                                onChange={(e) => setFilter({ ...filter, optionalText: e.target.value })}
                             />
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
                                 <Button
@@ -366,7 +398,7 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, optionalText: "" })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
@@ -385,8 +417,8 @@ export default function Workentry({ isDev }) {
                                 autoFocus
                                 className="mx-3 my-2 w-auto"
                                 // placeholder="Type to filter..."
-                                value={filter ? (filter.filterRubric === "date" ? filter.filterText : "") : ""}
-                                onChange={(e) => setFilter({ filterRubric: "date", filterText: e.target.value })}
+                                value={filter ? filter["date"] : ""}
+                                onChange={(e) => setFilter({ ...filter, date: e.target.value })}
                             />
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
                                 <Button
@@ -403,7 +435,7 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, date: "" })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
@@ -421,8 +453,8 @@ export default function Workentry({ isDev }) {
                                 type="text"
                                 autoFocus
                                 className="mx-3 my-2 w-auto"
-                                value={filter ? (filter.filterRubric === "start" ? filter.filterText : "") : ""}
-                                onChange={(e) => setFilter({ filterRubric: "start", filterText: e.target.value })}
+                                value={filter ? filter["start"] : ""}
+                                onChange={(e) => setFilter({ ...filter, start: e.target.value })}
                             />
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
                                 <Button
@@ -439,7 +471,7 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, start: "" })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
@@ -457,8 +489,8 @@ export default function Workentry({ isDev }) {
                                 type="text"
                                 autoFocus
                                 className="mx-3 my-2 w-auto"
-                                value={filter ? (filter.filterRubric === "end" ? filter.filterText : "") : ""}
-                                onChange={(e) => setFilter({ filterRubric: "end", filterText: e.target.value })}
+                                value={filter ? filter["end"] : ""}
+                                onChange={(e) => setFilter({ ...filter, end: e.target.value })}
                             />
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
                                 <Button
@@ -475,7 +507,7 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, end: "" })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
@@ -535,8 +567,8 @@ export default function Workentry({ isDev }) {
                             <Form>
                                 <Form.Check
                                     type="checkbox"
-                                    checked={filter ? (filter.filterRubric === "external" ? filter.filterText : false) : false}
-                                    onChange={(e) => setFilter({ filterRubric: "external", filterText: e.target.checked })}
+                                    checked={filter ? filter["external"] : ""}
+                                    onChange={(e) => setFilter({ ...filter, project: e.target.checked })}
                                 ></Form.Check>
                             </Form>
                             <ButtonGroup aria-label="Basic example" className="d-block mx-3 my-2 w-auto">
@@ -554,7 +586,7 @@ export default function Workentry({ isDev }) {
                                 >
                                     {sortAlphaDownIcon()}
                                 </Button>
-                                <Button variant="light" onClick={() => setFilter(null)}>
+                                <Button variant="light" onClick={() => setFilter({ ...filter, project: undefined })}>
                                     {ResetIcon()}
                                 </Button>
                             </ButtonGroup>
