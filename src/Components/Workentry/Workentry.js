@@ -712,180 +712,186 @@ export default function Workentry({ isDev }) {
                     </Dropdown>
                 </Col>
             </Row>
-            {filteredWorkentries.map((w) => (
-                <Row key={w._id} className="align-items-center data-row">
-                    <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <Dropdown>
-                                <Dropdown.Toggle className="filter-button w-100" variant="light">
-                                    {updateData.project.project || ""}
-                                </Dropdown.Toggle>
+            {filteredWorkentries.length ? (
+                filteredWorkentries.map((w) => (
+                    <Row key={w._id} className="align-items-center data-row">
+                        <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <Dropdown>
+                                    <Dropdown.Toggle className="filter-button w-100" variant="light">
+                                        {updateData.project.project || ""}
+                                    </Dropdown.Toggle>
 
-                                <Dropdown.Menu>
-                                    {projects.map((p) => (
-                                        <Dropdown.Item
-                                            eventKey={p._id}
-                                            onClick={() => setUpdateData({ ...updateData, project: { _id: p._id, project: p.project } })}
-                                        >
-                                            {p.project}
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        ) : w.project ? (
-                            w.project.project
-                        ) : (
-                            "Unbekanntes Projekt"
-                        )}
-                    </Col>
-                    <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            // <InputGroup>
-                            //     <FormControl value={updateData.category.category}></FormControl>
+                                    <Dropdown.Menu>
+                                        {projects.map((p) => (
+                                            <Dropdown.Item
+                                                eventKey={p._id}
+                                                onClick={() => setUpdateData({ ...updateData, project: { _id: p._id, project: p.project } })}
+                                            >
+                                                {p.project}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            ) : w.project ? (
+                                w.project.project
+                            ) : (
+                                "Unbekanntes Projekt"
+                            )}
+                        </Col>
+                        <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                // <InputGroup>
+                                //     <FormControl value={updateData.category.category}></FormControl>
+                                // </InputGroup>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light" className="filter-button w-100">
+                                        {updateData.category.category || ""}
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        {categories.map((c) => (
+                                            <Dropdown.Item
+                                                eventKey={c._id}
+                                                onClick={() => setUpdateData({ ...updateData, category: { _id: c._id, category: c.category } })}
+                                            >
+                                                {c.category}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            ) : w.category ? (
+                                w.category.category
+                            ) : (
+                                "Unbekannte Kategorie"
+                            )}
+                        </Col>
+                        <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <InputGroup>
+                                    <FormControl
+                                        value={updateData.optionalText}
+                                        onChange={(e) => setUpdateData({ ...updateData, optionalText: e.target.value })}
+                                    ></FormControl>
+                                </InputGroup>
+                            ) : (
+                                w.optionalText
+                            )}
+                        </Col>
+                        <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <InputGroup>
+                                    <FormControl
+                                        type="date"
+                                        value={updateData.date}
+                                        onChange={(e) => setUpdateData({ ...updateData, date: e.target.value })}
+                                    ></FormControl>
+                                </InputGroup>
+                            ) : (
+                                `${w.date ? w.date : "Unbekanntes Datum"}`
+                            )}
+                        </Col>
+                        <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <InputGroup>
+                                    <FormControl
+                                        type="time"
+                                        value={updateData.start ? updateData.start : updateData.fromDate ? updateData.fromDate : ""}
+                                        onChange={(e) => setUpdateData({ ...updateData, start: e.target.value })}
+                                    ></FormControl>
+                                </InputGroup>
+                            ) : (
+                                `${w.start ? w.start : w.fromDate ? w.fromDate : "Unbekannte Uhrzeit"}`
+                            )}
+                        </Col>
+                        <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <InputGroup>
+                                    <FormControl
+                                        type="time"
+                                        value={updateData.end ? updateData.end : updateData.untilDate ? updateData.untilDate : ""}
+                                        onChange={(e) => setUpdateData({ ...updateData, end: e.target.value })}
+                                    ></FormControl>
+                                </InputGroup>
+                            ) : (
+                                `${w.end ? w.end : w.untilDate ? w.untilDate : "Unbekannte Uhrzeit"}`
+                            )}
+                        </Col>
+                        <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <InputGroup>
+                                    <FormControl
+                                        type="number"
+                                        disabled
+                                        value={
+                                            w.start && w.end
+                                                ? calculateDuration(w.start, w.end)
+                                                : w.fromDate && w.untilDate
+                                                ? calculateDuration(w.fromDate, w.untilDate)
+                                                : "Keine Dauer verfügbar"
+                                        }
+                                    ></FormControl>
+                                </InputGroup>
+                            ) : w.start && w.end ? (
+                                calculateDuration(w.start, w.end)
+                            ) : w.fromDate && w.untilDate ? (
+                                calculateDuration(w.fromDate, w.untilDate)
+                            ) : (
+                                "Keine Dauer verfügbar"
+                            )}
+                        </Col>
+                        <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <Form>
+                                    <Form.Check
+                                        type="checkbox"
+                                        checked={updateData.external}
+                                        onChange={(e) => setUpdateData({ ...updateData, external: e.target.checked })}
+                                    ></Form.Check>
+                                </Form>
+                            ) : // <InputGroup className="justify-content-center">
+                            //     <FormControl
+                            //         size="sm"
+                            //         type="checkbox"
+                            //         checked={updateData.external}
+                            //         onChange={(e) => setUpdateData({ ...updateData, external: e.target.checked })}
+                            //     ></FormControl>
+                            //     {/* <InputGroup.Checkbox aria-label="Checkbox for following text input" /> */}
                             // </InputGroup>
-                            <Dropdown>
-                                <Dropdown.Toggle variant="light" className="filter-button w-100">
-                                    {updateData.category.category || ""}
-                                </Dropdown.Toggle>
-
-                                <Dropdown.Menu>
-                                    {categories.map((c) => (
-                                        <Dropdown.Item
-                                            eventKey={c._id}
-                                            onClick={() => setUpdateData({ ...updateData, category: { _id: c._id, category: c.category } })}
-                                        >
-                                            {c.category}
-                                        </Dropdown.Item>
-                                    ))}
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        ) : w.category ? (
-                            w.category.category
-                        ) : (
-                            "Unbekannte Kategorie"
-                        )}
-                    </Col>
-                    <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <InputGroup>
-                                <FormControl
-                                    value={updateData.optionalText}
-                                    onChange={(e) => setUpdateData({ ...updateData, optionalText: e.target.value })}
-                                ></FormControl>
-                            </InputGroup>
-                        ) : (
-                            w.optionalText
-                        )}
-                    </Col>
-                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <InputGroup>
-                                <FormControl
-                                    type="date"
-                                    value={updateData.date}
-                                    onChange={(e) => setUpdateData({ ...updateData, date: e.target.value })}
-                                ></FormControl>
-                            </InputGroup>
-                        ) : (
-                            `${w.date ? w.date : "Unbekanntes Datum"}`
-                        )}
-                    </Col>
-                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <InputGroup>
-                                <FormControl
-                                    type="time"
-                                    value={updateData.start ? updateData.start : updateData.fromDate ? updateData.fromDate : ""}
-                                    onChange={(e) => setUpdateData({ ...updateData, start: e.target.value })}
-                                ></FormControl>
-                            </InputGroup>
-                        ) : (
-                            `${w.start ? w.start : w.fromDate ? w.fromDate : "Unbekannte Uhrzeit"}`
-                        )}
-                    </Col>
-                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <InputGroup>
-                                <FormControl
-                                    type="time"
-                                    value={updateData.end ? updateData.end : updateData.untilDate ? updateData.untilDate : ""}
-                                    onChange={(e) => setUpdateData({ ...updateData, end: e.target.value })}
-                                ></FormControl>
-                            </InputGroup>
-                        ) : (
-                            `${w.end ? w.end : w.untilDate ? w.untilDate : "Unbekannte Uhrzeit"}`
-                        )}
-                    </Col>
-                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <InputGroup>
-                                <FormControl
-                                    type="number"
-                                    disabled
-                                    value={
-                                        w.start && w.end
-                                            ? calculateDuration(w.start, w.end)
-                                            : w.fromDate && w.untilDate
-                                            ? calculateDuration(w.fromDate, w.untilDate)
-                                            : "Keine Dauer verfügbar"
-                                    }
-                                ></FormControl>
-                            </InputGroup>
-                        ) : w.start && w.end ? (
-                            calculateDuration(w.start, w.end)
-                        ) : w.fromDate && w.untilDate ? (
-                            calculateDuration(w.fromDate, w.untilDate)
-                        ) : (
-                            "Keine Dauer verfügbar"
-                        )}
-                    </Col>
-                    <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <Form>
-                                <Form.Check
-                                    type="checkbox"
-                                    checked={updateData.external}
-                                    onChange={(e) => setUpdateData({ ...updateData, external: e.target.checked })}
-                                ></Form.Check>
-                            </Form>
-                        ) : // <InputGroup className="justify-content-center">
-                        //     <FormControl
-                        //         size="sm"
-                        //         type="checkbox"
-                        //         checked={updateData.external}
-                        //         onChange={(e) => setUpdateData({ ...updateData, external: e.target.checked })}
-                        //     ></FormControl>
-                        //     {/* <InputGroup.Checkbox aria-label="Checkbox for following text input" /> */}
-                        // </InputGroup>
-                        w.external ? (
-                            CheckIcon()
-                        ) : (
-                            ""
-                        )}
-                    </Col>
-                    <Col sm={1}>
-                        {!!updateData && w._id === updateData._id ? (
-                            <ButtonGroup>
-                                <Button onClick={handleUpdate} variant="primary">
-                                    <BsFillBookmarkFill />
-                                </Button>
-                                <Button onClick={async () => setUpdateData(null)} variant="warning">
-                                    <BsFillXCircleFill />
-                                </Button>
-                            </ButtonGroup>
-                        ) : (
-                            <ButtonGroup>
-                                <Button onClick={async () => setUpdateData({ ...w })} variant="dark">
-                                    <BsGear />
-                                </Button>
-                                <Button onClick={async () => handleDelete(w._id)} variant="danger">
-                                    <BsFillTrashFill />
-                                </Button>
-                            </ButtonGroup>
-                        )}
-                    </Col>
+                            w.external ? (
+                                CheckIcon()
+                            ) : (
+                                ""
+                            )}
+                        </Col>
+                        <Col sm={1}>
+                            {!!updateData && w._id === updateData._id ? (
+                                <ButtonGroup>
+                                    <Button onClick={handleUpdate} variant="primary">
+                                        <BsFillBookmarkFill />
+                                    </Button>
+                                    <Button onClick={async () => setUpdateData(null)} variant="warning">
+                                        <BsFillXCircleFill />
+                                    </Button>
+                                </ButtonGroup>
+                            ) : (
+                                <ButtonGroup>
+                                    <Button onClick={async () => setUpdateData({ ...w })} variant="dark">
+                                        <BsGear />
+                                    </Button>
+                                    <Button onClick={async () => handleDelete(w._id)} variant="danger">
+                                        <BsFillTrashFill />
+                                    </Button>
+                                </ButtonGroup>
+                            )}
+                        </Col>
+                    </Row>
+                ))
+            ) : (
+                <Row className="align-items-center data-row">
+                    <Col sm={12}>Keine Einträge vorhanden, eventuell Filter überprüfen</Col>
                 </Row>
-            ))}
+            )}
         </Container>
     );
 }
