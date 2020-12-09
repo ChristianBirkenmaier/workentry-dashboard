@@ -33,10 +33,10 @@ export default function Project({ isDev }) {
 
     async function fetchData() {
         try {
-            console.log(`Fetching from ${projectUrl}`);
+            // console.log(`Fetching from ${projectUrl}`);
             let [fetched_projects] = await Promise.all([fetch(projectUrl)]);
             fetched_projects = await fetched_projects.json();
-            console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_projects)}`);
+            // console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_projects)}`);
             setProjects(sortList(sort, fetched_projects.data));
         } catch (err) {
             console.error(err);
@@ -79,7 +79,7 @@ export default function Project({ isDev }) {
                                     });
                                     console.log(resp);
                                     resp = await resp.text();
-                                    console.log("Updated successfully", resp);
+                                    // console.log("Updated successfully", resp);
                                     fetchData();
                                     setUpdateId(null);
                                 }}

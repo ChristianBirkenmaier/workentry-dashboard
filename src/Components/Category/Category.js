@@ -31,10 +31,10 @@ export default function Category({ isDev }) {
 
     async function fetchData() {
         try {
-            console.log(`Fetching from ${categoryUrl}`);
+            // console.log(`Fetching from ${categoryUrl}`);
             let [fetched_categories] = await Promise.all([fetch(categoryUrl)]);
             fetched_categories = await fetched_categories.json();
-            console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_categories)}`);
+            // console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_categories)}`);
             if (fetched_categories.ok) {
                 setCategories(sortList(sort, fetched_categories.data));
             } else {
@@ -80,9 +80,9 @@ export default function Category({ isDev }) {
                                             category: updateCategory,
                                         }),
                                     });
-                                    console.log(resp);
+                                    // console.log(resp);
                                     resp = await resp.text();
-                                    console.log("Updated successfully", resp);
+                                    // console.log("Updated successfully", resp);
                                     fetchData();
                                     setUpdateId(null);
                                 }}
