@@ -5,84 +5,7 @@ import sortList from "../../helpers";
 import { BsFillTrashFill, BsGear, BsFillBookmarkFill, BsFillXCircleFill } from "react-icons/bs";
 import moment from "moment";
 import { CSVLink, CSVDownload } from "react-csv";
-
-const sortAlphaDownIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-sort-alpha-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path fillRule="evenodd" d="M4 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11A.5.5 0 0 1 4 2z" />
-        <path fillRule="evenodd" d="M6.354 11.146a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L4 12.793l1.646-1.647a.5.5 0 0 1 .708 0z" />
-        <path d="M9.664 7l.418-1.371h1.781L12.281 7h1.121l-1.78-5.332h-1.235L8.597 7h1.067zM11 2.687l.652 2.157h-1.351l.652-2.157H11zM9.027 14h3.934v-.867h-2.645v-.055l2.567-3.719v-.691H9.098v.867h2.507v.055l-2.578 3.719V14z" />
-    </svg>
-);
-
-const sortAlphaUpIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-sort-alpha-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path fillRule="evenodd" d="M4 14a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-1 0v11a.5.5 0 0 0 .5.5z" />
-        <path fillRule="evenodd" d="M6.354 4.854a.5.5 0 0 0 0-.708l-2-2a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L4 3.207l1.646 1.647a.5.5 0 0 0 .708 0z" />
-        <path d="M9.664 7l.418-1.371h1.781L12.281 7h1.121l-1.78-5.332h-1.235L8.597 7h1.067zM11 2.687l.652 2.157h-1.351l.652-2.157H11zM9.027 14h3.934v-.867h-2.645v-.055l2.567-3.719v-.691H9.098v.867h2.507v.055l-2.578 3.719V14z" />
-    </svg>
-);
-
-const sortNumericDownIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-sort-numeric-down" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path fillRule="evenodd" d="M4 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11A.5.5 0 0 1 4 2z" />
-        <path fillRule="evenodd" d="M6.354 11.146a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L4 12.793l1.646-1.647a.5.5 0 0 1 .708 0z" />
-        <path d="M12.438 7V1.668H11.39l-1.262.906v.969l1.21-.86h.052V7h1.046zm-2.84 5.82c.054.621.625 1.278 1.761 1.278 1.422 0 2.145-.98 2.145-2.848 0-2.05-.973-2.688-2.063-2.688-1.125 0-1.972.688-1.972 1.836 0 1.145.808 1.758 1.719 1.758.69 0 1.113-.351 1.261-.742h.059c.031 1.027-.309 1.856-1.133 1.856-.43 0-.715-.227-.773-.45H9.598zm2.757-2.43c0 .637-.43.973-.933.973-.516 0-.934-.34-.934-.98 0-.625.407-1 .926-1 .543 0 .941.375.941 1.008z" />
-    </svg>
-);
-
-const sortNumericUpIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-sort-numeric-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path fillRule="evenodd" d="M4 14a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-1 0v11a.5.5 0 0 0 .5.5z" />
-        <path fillRule="evenodd" d="M6.354 4.854a.5.5 0 0 0 0-.708l-2-2a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L4 3.207l1.646 1.647a.5.5 0 0 0 .708 0z" />
-        <path d="M12.438 7V1.668H11.39l-1.262.906v.969l1.21-.86h.052V7h1.046zm-2.84 5.82c.054.621.625 1.278 1.761 1.278 1.422 0 2.145-.98 2.145-2.848 0-2.05-.973-2.688-2.063-2.688-1.125 0-1.972.688-1.972 1.836 0 1.145.808 1.758 1.719 1.758.69 0 1.113-.351 1.261-.742h.059c.031 1.027-.309 1.856-1.133 1.856-.43 0-.715-.227-.773-.45H9.598zm2.757-2.43c0 .637-.43.973-.933.973-.516 0-.934-.34-.934-.98 0-.625.407-1 .926-1 .543 0 .941.375.941 1.008z" />
-    </svg>
-);
-
-const CheckIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path
-            fillRule="evenodd"
-            d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"
-        />
-    </svg>
-);
-const ResetIcon = () => (
-    <svg width="1.5em" height="1.5em" viewBox="0 0 16 16" className="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path
-            fillRule="evenodd"
-            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"
-        />
-    </svg>
-);
-
-const DownloadIcon = () => (
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-download" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path
-            fillRule="evenodd"
-            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"
-        />
-        <path
-            fillRule="evenodd"
-            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"
-        />
-    </svg>
-);
-
-const filterIcon = () => (
-    // <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-filter-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    //     <path fillRule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-    //     <path
-    //         fillRule="evenodd"
-    //         d="M7 11.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5z"
-    //     />
-    // </svg>
-    <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-filter" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-        <path
-            fillRule="evenodd"
-            d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"
-        />
-    </svg>
-);
+import { filterIcon, resetIcon, downloadIcon, checkIcon, sortAlphaDownIcon, sortAlphaUpIcon, sortNumericUpIcon, sortNumericDownIcon } from "../../assets/icons";
 
 const csvHeaders = [
     { label: "Projekt", key: "project.project" },
@@ -115,6 +38,8 @@ export default function Workentry({ isDev }) {
     let [filter, setFilter] = useState([{ filterRubric: "date", filterText: moment().format("YYYY-MM-DD") }]);
     let [updateData, setUpdateData] = useState(null);
     let [count, setCount] = useState(0);
+    let [skip, setSkip] = useState(0);
+    let [limit, setLimit] = useState(20);
 
     const DEV_URLS = { workentryUrl: DEV_WORKENTRY_API, categoryUrl: DEV_CATEGORY_API, projectUrl: DEV_PROJECT_API };
     const PROD_URLS = {
@@ -127,22 +52,30 @@ export default function Workentry({ isDev }) {
 
     let [sort, setSort] = useState({ name: "category.category", asc: false });
 
+    function buildWorkentryQueryString() {
+        let paramString = filter
+            .map((f) => `&${f.filterRubric}=${f.filterText}`)
+            .toString()
+            .replaceAll(",", "");
+
+        let string = `${urls.workentryUrl}?limit=${limit}&skip=${skip}${paramString}`;
+
+        return string;
+    }
+
     async function fetchData() {
         try {
             // console.log(`Fetching from ${JSON.stringify(urls)}`);
+            let workentryQuery = buildWorkentryQueryString();
+            console.log(workentryQuery);
             let [fetched_projects, workentries, fetched_categories] = await Promise.all([
                 fetch(urls.projectUrl),
-                fetch(urls.workentryUrl),
+                fetch(workentryQuery),
                 fetch(urls.categoryUrl),
             ]);
             workentries = await workentries.json();
             fetched_categories = await fetched_categories.json();
-            // console.dir(`Successfully fetched, data recieved: ${JSON.stringify(workentries)}`);
             fetched_projects = await fetched_projects.json();
-            // console.dir(`Successfully fetched, data recieved: ${JSON.stringify(fetched_projects)}`);
-            // setCategories(sortList({ name: "category", asc: true }, fetched_categories.data));
-            // setProjects(sortList({ name: "project", asc: true }, fetched_projects.data));
-            // setWorkentries(sortList(sort, workentries.data));
             setCategories(sortList({ name: "category", asc: true }, fetched_categories.data));
             setProjects(sortList({ name: "project", asc: true }, fetched_projects.data));
             setWorkentries(workentries.data);
@@ -153,16 +86,21 @@ export default function Workentry({ isDev }) {
     }
     useEffect(async () => {
         await fetchData();
-    }, []);
-    useEffect(() => {
-        console.log("useeffect workentries, filter");
-        if (filter.length === 0) {
-            return setFilteredWorkentries(workentries);
-        }
-        console.log(filter);
-        console.log(workentries);
-        setFilteredWorkentries(workentries.filter(_filter));
-    }, [workentries, filter]);
+    }, [filter]);
+
+    // useEffect(async () => {
+    //     await fetchData();
+    // }, []);
+    // useEffect(() => {
+    //     // buildWorkentryQueryString()
+    //     console.log("useeffect workentries, filter");
+    //     if (filter.length === 0) {
+    //         return setFilteredWorkentries(workentries);
+    //     }
+    //     console.log(filter);
+    //     console.log(workentries);
+    //     setFilteredWorkentries(workentries.filter(_filter));
+    // }, [workentries, filter]);
 
     useEffect(() => {
         setFilteredWorkentries(sortList(sort, filteredWorkentries));
@@ -207,37 +145,7 @@ export default function Workentry({ isDev }) {
             }
         });
         return show;
-
-        // let showItemArray = filterValues.map((fi) => {
-        //     let [filterType, filterValue] = fi;
-        //     // console.log("filtertype", filterType, filterValue, itemToFilter);
-        //     // if (filter === null || filter.filterRubric === null || filter.filterText === null) {
-        //     //         console.log("empty filter");
-        //     //         return true;
-        //     // }
-        //     switch (filterType) {
-        //         case "project":
-        //             return itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filterValue);
-        //         case "category":
-        //             return itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filterValue);
-        //         case "optionalText":
-        //             return itemToFilter.optionalText.includes(filterValue);
-        //         case "date":
-        //             return itemToFilter.date ? itemToFilter.date.includes(filterValue) : true;
-        //         // case "external":
-        //         //     return itemToFilter.external && itemToFilter.external === filterValue;
-        //         default:
-        //             // console.log("filter default case, maybe something's wrong here");
-        //             return true;
-        //     }
-        // });
-        // // console.log(showItemArray);
-        // return showItemArray.every((v) => !!v);
     }
-
-    // useEffect(() => {
-    //     setFilteredWorkentries(workentries.filter(_filter));
-    // }, [filter]);
 
     async function handleDelete(id) {
         try {
@@ -328,6 +236,18 @@ export default function Workentry({ isDev }) {
         return "";
     }
 
+    function mapFilterIdToFilterName(filterRubric, filterText) {
+        if (filterRubric !== "project" && filterRubric !== "category") {
+            return filterText;
+        }
+        switch (filterRubric) {
+            case "project":
+                return projects.filter((p) => p._id === filterText)[0].project;
+            case "category":
+                return categories.filter((c) => c._id === filterText)[0].category;
+        }
+    }
+
     return (
         <Container fluid className="data-container">
             <Row>
@@ -339,7 +259,7 @@ export default function Workentry({ isDev }) {
                             style={{ cursor: "pointer" }}
                             onClick={() => setFilter([...filter.filter((x) => x.filterRubric != f.filterRubric && x.filterText != f.filterText)])}
                         >
-                            {f.filterText} {ResetIcon()}
+                            {mapFilterIdToFilterName(f.filterRubric, f.filterText)} {resetIcon()}
                             {/* {
                                 <span
                                     style={{ cursor: "pointer" }}
@@ -383,7 +303,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, project: "" })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                             {/* <Dropdown.Item onClick={() => setFilter({ name: "", asc: undefined })}>Reset Filter X</Dropdown.Item> */}
@@ -391,7 +311,7 @@ export default function Workentry({ isDev }) {
                                 <Dropdown.Item
                                     eventKey={p._id}
                                     onClick={() =>
-                                        setFilter([...filter.filter((f) => f.filterRubric !== "project"), { filterRubric: "project", filterText: p.project }])
+                                        setFilter([...filter.filter((f) => f.filterRubric !== "project"), { filterRubric: "project", filterText: p._id }])
                                     }
                                 >
                                     {p.project}
@@ -437,17 +357,14 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, category: "" })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                             {categories.map((c) => (
                                 <Dropdown.Item
                                     eventKey={c._id}
                                     onClick={() =>
-                                        setFilter([
-                                            ...filter.filter((f) => f.filterRubric !== "category"),
-                                            { filterRubric: "category", filterText: c.category },
-                                        ])
+                                        setFilter([...filter.filter((f) => f.filterRubric !== "category"), { filterRubric: "category", filterText: c._id }])
                                     }
                                 >
                                     {c.category}
@@ -486,7 +403,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, optionalText: "" })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                         </Dropdown.Menu>
@@ -533,7 +450,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, date: "" })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                         </Dropdown.Menu>
@@ -569,7 +486,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, start: "" })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                         </Dropdown.Menu>
@@ -605,7 +522,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, end: "" })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                         </Dropdown.Menu>
@@ -641,7 +558,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 <Button variant="light" onClick={() => setFilter(null)}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button>
                             </ButtonGroup>
                         </Dropdown.Menu> */}
@@ -690,7 +607,7 @@ export default function Workentry({ isDev }) {
                                     {sortAlphaDownIcon()}
                                 </Button>
                                 {/* <Button variant="light" onClick={() => setFilter({ ...filter, project: undefined })}>
-                                    {ResetIcon()}
+                                    {resetIcon()}
                                 </Button> */}
                             </ButtonGroup>
                         </Dropdown.Menu>
@@ -699,7 +616,7 @@ export default function Workentry({ isDev }) {
                 <Col className="list-header-row" sm={1}>
                     <Dropdown as={ButtonGroup} className="w-100">
                         <Dropdown.Toggle className="filter-button w-100" variant="light">
-                            Download {DownloadIcon()}
+                            Download {downloadIcon()}
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
@@ -712,8 +629,8 @@ export default function Workentry({ isDev }) {
                     </Dropdown>
                 </Col>
             </Row>
-            {filteredWorkentries.length ? (
-                filteredWorkentries.map((w) => (
+            {workentries.length ? (
+                workentries.map((w) => (
                     <Row key={w._id} className="align-items-center data-row">
                         <Col sm={2} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
                             {!!updateData && w._id === updateData._id ? (
@@ -859,7 +776,7 @@ export default function Workentry({ isDev }) {
                             //     {/* <InputGroup.Checkbox aria-label="Checkbox for following text input" /> */}
                             // </InputGroup>
                             w.external ? (
-                                CheckIcon()
+                                checkIcon()
                             ) : (
                                 ""
                             )}
