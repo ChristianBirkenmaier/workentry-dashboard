@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { PROD_WORKENTRY_API, DEV_WORKENTRY_API, PROD_PROJECT_API, DEV_PROJECT_API, PROD_CATEGORY_API, DEV_CATEGORY_API } from "../../config/api.json";
-import { Col, Container, Row, Button, FormControl, InputGroup, Dropdown, ButtonGroup, Form, Badge } from "react-bootstrap";
+import { Col, Container, Row, Button, FormControl, InputGroup, Dropdown, ButtonGroup, Form, Badge, Modal } from "react-bootstrap";
 import sortList from "../../helpers";
 import { BsFillTrashFill, BsGear, BsFillBookmarkFill, BsFillXCircleFill } from "react-icons/bs";
 import moment from "moment";
 import { CSVLink, CSVDownload } from "react-csv";
-import { filterIcon, resetIcon, downloadIcon, checkIcon, sortAlphaDownIcon, sortAlphaUpIcon, sortNumericUpIcon, sortNumericDownIcon } from "../../assets/icons";
+import {
+    filterIcon,
+    resetIcon,
+    downloadIcon,
+    checkIcon,
+    sortAlphaDownIcon,
+    sortAlphaUpIcon,
+    sortNumericUpIcon,
+    sortNumericDownIcon,
+    sliderIcon,
+} from "../../assets/icons";
 
 const csvHeaders = [
     { label: "Projekt", key: "project.project" },
@@ -34,12 +44,12 @@ export default function Workentry({ isDev }) {
     let [filteredWorkentries, setFilteredWorkentries] = useState([]);
     let [categories, setCategories] = useState([]);
     let [projects, setProjects] = useState([]);
-    // let [filter, setFilter] = useState(filterEntries);
     let [filter, setFilter] = useState([{ filterRubric: "date", filterText: moment().format("YYYY-MM-DD") }]);
     let [updateData, setUpdateData] = useState(null);
     let [count, setCount] = useState(0);
     let [skip, setSkip] = useState(0);
-    let [limit, setLimit] = useState(20);
+    let [limit, setLimit] = useState(0);
+    let [showModal, setShowModal] = useState(false);
 
     const DEV_URLS = { workentryUrl: DEV_WORKENTRY_API, categoryUrl: DEV_CATEGORY_API, projectUrl: DEV_PROJECT_API };
     const PROD_URLS = {
@@ -63,9 +73,11 @@ export default function Workentry({ isDev }) {
         return string;
     }
 
+    const handleClose = () => setShowModal(false);
+    const handleShow = () => setShowModal(true);
+
     async function fetchData() {
         try {
-            // console.log(`Fetching from ${JSON.stringify(urls)}`);
             let workentryQuery = buildWorkentryQueryString();
             console.log(workentryQuery);
             let [fetched_projects, workentries, fetched_categories] = await Promise.all([
@@ -87,21 +99,6 @@ export default function Workentry({ isDev }) {
     useEffect(async () => {
         await fetchData();
     }, [filter]);
-
-    // useEffect(async () => {
-    //     await fetchData();
-    // }, []);
-    // useEffect(() => {
-    //     // buildWorkentryQueryString()
-    //     console.log("useeffect workentries, filter");
-    //     if (filter.length === 0) {
-    //         return setFilteredWorkentries(workentries);
-    //     }
-    //     console.log(filter);
-    //     console.log(workentries);
-    //     setFilteredWorkentries(workentries.filter(_filter));
-    // }, [workentries, filter]);
-
     useEffect(() => {
         setFilteredWorkentries(sortList(sort, filteredWorkentries));
     }, [sort]);
@@ -116,36 +113,35 @@ export default function Workentry({ isDev }) {
 
     useEffect(() => console.log("Count", count), [count]);
 
-    function _filter(itemToFilter) {
-        // setCount(count++);
+    // function _filter(itemToFilter) {
 
-        let show = true;
-        filter.forEach((f) => {
-            let { filterRubric, filterText } = f;
-            switch (filterRubric) {
-                case "project":
-                    show = itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filterText);
-                    console.log("show", show);
-                    break;
-                case "category":
-                    show = itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filterText);
-                    break;
-                case "optionalText":
-                    show = itemToFilter.optionalText.includes(filterText);
-                    break;
-                case "date":
-                    show = itemToFilter.date ? itemToFilter.date.includes(filterText) : true;
-                    break;
-                // case "external":
-                //     return itemToFilter.external && itemToFilter.external === filterValue;
-                default:
-                    console.log("filter default case, maybe something's wrong here");
-                    show = true;
-                    break;
-            }
-        });
-        return show;
-    }
+    //     let show = true;
+    //     filter.forEach((f) => {
+    //         let { filterRubric, filterText } = f;
+    //         switch (filterRubric) {
+    //             case "project":
+    //                 show = itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filterText);
+    //                 console.log("show", show);
+    //                 break;
+    //             case "category":
+    //                 show = itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filterText);
+    //                 break;
+    //             case "optionalText":
+    //                 show = itemToFilter.optionalText.includes(filterText);
+    //                 break;
+    //             case "date":
+    //                 show = itemToFilter.date ? itemToFilter.date.includes(filterText) : true;
+    //                 break;
+    //             // case "external":
+    //             //     return itemToFilter.external && itemToFilter.external === filterValue;
+    //             default:
+    //                 console.log("filter default case, maybe something's wrong here");
+    //                 show = true;
+    //                 break;
+    //         }
+    //     });
+    //     return show;
+    // }
 
     async function handleDelete(id) {
         try {
@@ -206,20 +202,16 @@ export default function Workentry({ isDev }) {
     }
 
     function showFilterValues() {
-        let filterValues = [];
-        // for (const [key, value] of Object.entries(filter)) {
-        //     if (value !== "") {
-        //         filterValues.push(`Filter: ${key}, Wert: ${value}`);
-        //     }
-        // }
-        if (!filter) return;
-        let r = filter.map((f) => (
-            <span
-                onClick={() => setFilter(filter.filter((x) => x.filterRubric != f.filterRubric && x.filterText != f.filterText))}
-            >{`Typ: ${f.filterRubric}, Wert: ${f.filterText}`}</span>
+        return filter.map((f) => (
+            <Badge
+                pill
+                variant="warning d-inline-flex align-items-center"
+                style={{ cursor: "pointer" }}
+                onClick={() => setFilter([...filter.filter((x) => x.filterRubric != f.filterRubric && x.filterText != f.filterText)])}
+            >
+                {mapFilterIdToFilterName(f.filterRubric, f.filterText)} {resetIcon()}
+            </Badge>
         ));
-        // console.log(r);
-        return r;
     }
 
     function getFilterValue(identifier) {
@@ -251,26 +243,7 @@ export default function Workentry({ isDev }) {
     return (
         <Container fluid className="data-container">
             <Row>
-                <Col className="d-flex align-items-center">
-                    {filter.map((f) => (
-                        <Badge
-                            pill
-                            variant="warning d-inline-flex align-items-center"
-                            style={{ cursor: "pointer" }}
-                            onClick={() => setFilter([...filter.filter((x) => x.filterRubric != f.filterRubric && x.filterText != f.filterText)])}
-                        >
-                            {mapFilterIdToFilterName(f.filterRubric, f.filterText)} {resetIcon()}
-                            {/* {
-                                <span
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => setFilter([...filter.filter((x) => x.filterRubric != f.filterRubric && x.filterText != f.filterText)])}
-                                >
-                                   
-                                </span>
-                            } */}
-                        </Badge>
-                    ))}
-                </Col>
+                <Col className="d-flex align-items-center">{showFilterValues()}</Col>
             </Row>
             <Row className="data-header align-items-center">
                 <Col className="list-header-row" sm={2}>
@@ -809,6 +782,23 @@ export default function Workentry({ isDev }) {
                     <Col sm={12}>Keine Einträge vorhanden, eventuell Filter überprüfen</Col>
                 </Row>
             )}
+            {/* <Button onClick={handleShow} variant="outline-warning" className="fixed-bottom m-3 p-3 rounded">
+                {sliderIcon()}
+            </Button>
+            <Modal show={showModal} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Filtereinstellungen</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleClose}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal> */}
         </Container>
     );
 }
