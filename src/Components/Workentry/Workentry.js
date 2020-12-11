@@ -28,18 +28,14 @@ const csvHeaders = [
     { label: "Bis", key: "end" },
     { label: "Extern", key: "external" },
 ];
+const DEV_URLS = { workentryUrl: DEV_WORKENTRY_API, categoryUrl: DEV_CATEGORY_API, projectUrl: DEV_PROJECT_API };
+const PROD_URLS = {
+    workentryUrl: PROD_WORKENTRY_API,
+    categoryUrl: PROD_CATEGORY_API,
+    projectUrl: PROD_PROJECT_API,
+};
 
 export default function Workentry({ isDev }) {
-    const filterEntries = {
-        project: "",
-        category: "",
-        optionalText: "",
-        date: "",
-        start: "",
-        end: "",
-        duration: "",
-        external: "",
-    };
     let [workentries, setWorkentries] = useState([]);
     let [filteredWorkentries, setFilteredWorkentries] = useState([]);
     let [categories, setCategories] = useState([]);
@@ -50,17 +46,28 @@ export default function Workentry({ isDev }) {
     let [skip, setSkip] = useState(0);
     let [limit, setLimit] = useState(0);
     let [showModal, setShowModal] = useState(false);
-
-    const DEV_URLS = { workentryUrl: DEV_WORKENTRY_API, categoryUrl: DEV_CATEGORY_API, projectUrl: DEV_PROJECT_API };
-    const PROD_URLS = {
-        workentryUrl: PROD_WORKENTRY_API,
-        categoryUrl: PROD_CATEGORY_API,
-        projectUrl: PROD_PROJECT_API,
-    };
-
+    const handleClose = () => setShowModal(false);
+    const handleShow = () => setShowModal(true);
     const [urls, setUrls] = useState(isDev ? DEV_URLS : PROD_URLS);
-
     let [sort, setSort] = useState({ name: "category.category", asc: false });
+
+    useEffect(async () => {
+        await fetchData();
+    }, [filter]);
+    useEffect(() => {
+        console.log("[sort]", sort);
+        setWorkentries(sortList(sort, workentries));
+    }, [sort]);
+
+    useEffect(() => {
+        setUrls(isDev ? { ...DEV_URLS } : { ...PROD_URLS });
+    }, [isDev]);
+
+    useEffect(() => {
+        fetchData();
+    }, [urls]);
+
+    useEffect(() => console.log("Count", count), [count]);
 
     function buildWorkentryQueryString() {
         let paramString = filter
@@ -72,9 +79,6 @@ export default function Workentry({ isDev }) {
 
         return string;
     }
-
-    const handleClose = () => setShowModal(false);
-    const handleShow = () => setShowModal(true);
 
     async function fetchData() {
         try {
@@ -90,59 +94,16 @@ export default function Workentry({ isDev }) {
             fetched_projects = await fetched_projects.json();
             setCategories(sortList({ name: "category", asc: true }, fetched_categories.data));
             setProjects(sortList({ name: "project", asc: true }, fetched_projects.data));
-            setWorkentries(workentries.data);
+            setWorkentries(
+                workentries.data.map((w) => {
+                    return { ...w, duration: w.start && w.end ? calculateDuration(w.start, w.end) : calculateDuration(w.fromDate, w.untilDate) };
+                })
+            );
         } catch (err) {
             console.error(err);
             setWorkentries([]);
         }
     }
-    useEffect(async () => {
-        await fetchData();
-    }, [filter]);
-    useEffect(() => {
-        setFilteredWorkentries(sortList(sort, filteredWorkentries));
-    }, [sort]);
-
-    useEffect(() => {
-        setUrls(isDev ? { ...DEV_URLS } : { ...PROD_URLS });
-    }, [isDev]);
-
-    useEffect(() => {
-        fetchData();
-    }, [urls]);
-
-    useEffect(() => console.log("Count", count), [count]);
-
-    // function _filter(itemToFilter) {
-
-    //     let show = true;
-    //     filter.forEach((f) => {
-    //         let { filterRubric, filterText } = f;
-    //         switch (filterRubric) {
-    //             case "project":
-    //                 show = itemToFilter.project && itemToFilter.project.project && itemToFilter.project.project.includes(filterText);
-    //                 console.log("show", show);
-    //                 break;
-    //             case "category":
-    //                 show = itemToFilter.category && itemToFilter.category.category && itemToFilter.category.category.includes(filterText);
-    //                 break;
-    //             case "optionalText":
-    //                 show = itemToFilter.optionalText.includes(filterText);
-    //                 break;
-    //             case "date":
-    //                 show = itemToFilter.date ? itemToFilter.date.includes(filterText) : true;
-    //                 break;
-    //             // case "external":
-    //             //     return itemToFilter.external && itemToFilter.external === filterValue;
-    //             default:
-    //                 console.log("filter default case, maybe something's wrong here");
-    //                 show = true;
-    //                 break;
-    //         }
-    //     });
-    //     return show;
-    // }
-
     async function handleDelete(id) {
         try {
             await fetch(`${urls.workentryUrl}/${id}`, { method: "DELETE" });
@@ -201,7 +162,7 @@ export default function Workentry({ isDev }) {
         setUpdateData(null);
     }
 
-    function showFilterValues() {
+    function showActiveFilters() {
         return filter.map((f) => (
             <Badge
                 pill
@@ -209,9 +170,24 @@ export default function Workentry({ isDev }) {
                 style={{ cursor: "pointer" }}
                 onClick={() => setFilter([...filter.filter((x) => x.filterRubric != f.filterRubric && x.filterText != f.filterText)])}
             >
-                {mapFilterIdToFilterName(f.filterRubric, f.filterText)} {resetIcon()}
+                {getFilterRubricName(f.filterRubric)}: {getFilterName(f.filterRubric, f.filterText)} {resetIcon()}
             </Badge>
         ));
+    }
+
+    function getFilterRubricName(filterRubric) {
+        switch (filterRubric) {
+            case "project":
+                return "Projekt";
+            case "category":
+                return "Kategorie";
+            case "external":
+                return "Extern";
+            case "date":
+                return "Datum";
+            default:
+                return filterRubric;
+        }
     }
 
     function getFilterValue(identifier) {
@@ -228,22 +204,27 @@ export default function Workentry({ isDev }) {
         return "";
     }
 
-    function mapFilterIdToFilterName(filterRubric, filterText) {
-        if (filterRubric !== "project" && filterRubric !== "category") {
-            return filterText;
-        }
+    function getFilterName(filterRubric, filterText) {
+        // if (filterRubric !== "project" && filterRubric !== "category" && filterRubric !== "exter") {
+        //     return filterText;
+        // }
         switch (filterRubric) {
             case "project":
                 return projects.filter((p) => p._id === filterText)[0].project;
             case "category":
                 return categories.filter((c) => c._id === filterText)[0].category;
+            case "external":
+                console.log(filterText);
+                return filterText ? "Extern" : "Intern";
+            default:
+                return filterText;
         }
     }
 
     return (
         <Container fluid className="data-container">
             <Row>
-                <Col className="d-flex align-items-center">{showFilterValues()}</Col>
+                <Col className="d-flex align-items-center">{showActiveFilters()}</Col>
             </Row>
             <Row className="data-header align-items-center">
                 <Col className="list-header-row" sm={2}>
@@ -710,24 +691,10 @@ export default function Workentry({ isDev }) {
                         <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
                             {!!updateData && w._id === updateData._id ? (
                                 <InputGroup>
-                                    <FormControl
-                                        type="number"
-                                        disabled
-                                        value={
-                                            w.start && w.end
-                                                ? calculateDuration(w.start, w.end)
-                                                : w.fromDate && w.untilDate
-                                                ? calculateDuration(w.fromDate, w.untilDate)
-                                                : "Keine Dauer verfügbar"
-                                        }
-                                    ></FormControl>
+                                    <FormControl type="text" disabled value={w.duration}></FormControl>
                                 </InputGroup>
-                            ) : w.start && w.end ? (
-                                calculateDuration(w.start, w.end)
-                            ) : w.fromDate && w.untilDate ? (
-                                calculateDuration(w.fromDate, w.untilDate)
                             ) : (
-                                "Keine Dauer verfügbar"
+                                w.duration || "Keine Dauer verfügbar"
                             )}
                         </Col>
                         <Col sm={1} className={!!updateData && w._id === updateData._id ? "p-0" : ""}>
